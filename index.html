@@ -1,0 +1,1438 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Estratega de Reels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+/* Layout: una columna centrada y tranquila. Tres vistas: formulario, semana en pestañas, formulario de resultados. */
+:root{
+  --bg:#F4F6F7; --surface:#FFFFFF; --fg:#1F2B33; --muted:#66747E; --line:#E1E7EB; --field:#F8FAFB;
+  --accent:#2F6F69; --accent-ink:#FFFFFF; --accent-soft:#E5F0EE; --mark:#FFF1D2; --mark-ink:#7A5310; --danger:#A6423A;
+  --head:"Manrope", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12181B; --surface:#1A2226; --fg:#E4EBEE; --muted:#99A7B0; --line:#2A353B; --field:#151C20;
+  --accent:#74B9B0; --accent-ink:#0E1B19; --accent-soft:#1D2F2D; --mark:#3A3119; --mark-ink:#F0D08E; --danger:#E08A80; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#12181B; --surface:#1A2226; --fg:#E4EBEE; --muted:#99A7B0; --line:#2A353B; --field:#151C20;
+  --accent:#74B9B0; --accent-ink:#0E1B19; --accent-soft:#1D2F2D; --mark:#3A3119; --mark-ink:#F0D08E; --danger:#E08A80; color-scheme:dark }
+
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6}
+*{box-sizing:border-box}
+button,textarea,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3,h4{font-family:var(--head);text-wrap:balance}
+
+.page{max-width:900px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:flex;flex-direction:column;gap:22px}
+
+/* Encabezado */
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:grid;place-items:center;flex:none}
+.logo svg{display:block}
+.brand b{font-family:var(--head);font-weight:700;font-size:18px;display:block;line-height:1.2}
+.brand small{color:var(--muted);font-size:13.5px}
+
+.btn{border-radius:10px;padding:10px 16px;font-weight:600;font-size:15px;cursor:pointer;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{padding:7px 12px;font-size:14px;border-radius:9px}
+.link{background:none;border:none;padding:0;color:var(--accent);font-weight:600;cursor:pointer;font-size:15px}
+.link:hover{text-decoration:underline}
+
+.banner{background:var(--accent-soft);border-radius:12px;padding:12px 16px;font-size:15px}
+.banner.err{background:var(--mark);color:var(--fg)}
+
+/* Formularios */
+.intro{display:flex;flex-direction:column;gap:6px}
+.intro h1{font-size:clamp(26px,3.6vw,32px);font-weight:700;margin:0;letter-spacing:-.01em}
+.intro p{margin:0;color:var(--muted);max-width:62ch}
+.introrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:6px}
+form{display:flex;flex-direction:column;gap:16px}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);margin:0;padding:20px;display:flex;flex-direction:column;gap:16px}
+legend{font-family:var(--head);font-weight:700;font-size:15px;padding:0 6px;margin-left:-6px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field > label,.field > .q{font-weight:600;font-size:15px}
+.req{font-weight:500;font-size:12.5px;color:var(--muted);margin-left:6px}
+.field small{color:var(--muted);font-size:13.5px;line-height:1.4}
+input[type=text],textarea{width:100%;border:1px solid var(--line);background:var(--field);border-radius:10px;padding:10px 12px;line-height:1.45;font-size:15.5px}
+textarea{resize:vertical;min-height:72px}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+::placeholder{color:var(--muted);opacity:.75}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:15px;cursor:pointer;background:var(--field)}
+.chips input{accent-color:var(--accent);margin:0}
+.chips label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;background:var(--field)}
+.drop:hover,.drop.over{border-color:var(--accent);color:var(--fg)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumbs figure{margin:0;position:relative;width:64px;height:64px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs button{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#fff;font-size:11px;cursor:pointer}
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.formmsg{font-size:14px;color:var(--muted)}
+
+/* Semana */
+.weekhead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.weekhead h1{font-size:clamp(24px,3.4vw,30px);font-weight:700;margin:0;letter-spacing:-.01em}
+.weekhead p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
+.headbtns{display:flex;gap:8px;flex-wrap:wrap}
+
+.progress{display:flex;flex-direction:column;gap:8px}
+.progress .line{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress .line i{display:block;height:100%;width:0;background:var(--accent);border-radius:4px;transition:width .4s ease}
+.progress .txt{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);align-items:center}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.tab{flex:none;background:transparent;border:1px solid transparent;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14.5px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tab:hover:not(:disabled){color:var(--fg)}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--fg)}
+.tab:disabled{opacity:.45;cursor:default}
+.tab .st{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tab.ready .st{background:var(--accent)}
+.tab.writing .st{background:var(--accent);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.tab.writing .st{animation:none}.progress .line i{transition:none}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;min-height:280px;min-width:0;overflow-wrap:anywhere}
+.panelnav{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.panelnav .mid{display:flex;gap:10px}
+.waiting{color:var(--muted);display:flex;flex-direction:column;gap:6px;padding:20px 0}
+.waiting b{color:var(--fg);font-family:var(--head)}
+
+.md{font-size:16px}
+.md > :first-child{margin-top:0}
+.md > :last-child{margin-bottom:0}
+.md h1,.md h2,.md h3{font-size:21px;font-weight:700;margin:1.3em 0 .5em;line-height:1.25}
+.md h4{font-family:var(--head);font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:1.6em 0 .5em;padding-top:1em;border-top:1px solid var(--line)}
+.md h3 + p,.md h3 + ul{color:var(--muted)}
+.md p{margin:.6em 0}
+.md ul,.md ol{padding-left:1.25em;margin:.5em 0}
+.md li{margin:.25em 0}
+.md li::marker{color:var(--muted)}
+.md hr{border:none;border-top:1px solid var(--line);margin:1.4em 0}
+.md code{font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;font-size:.88em;background:var(--field);padding:1px 5px;border-radius:4px}
+.md pre{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre-wrap;line-height:1.5}
+.md pre code{background:none;padding:0;font-size:14px}
+.md blockquote{margin:.8em 0;padding:.1em 0 .1em 14px;border-left:3px solid var(--accent-soft);color:var(--muted)}
+.md mark{background:var(--mark);color:var(--mark-ink);padding:1px 5px;border-radius:5px;font-weight:600}
+.tbl{overflow-x:auto;margin:.9em 0;border:1px solid var(--line);border-radius:10px}
+.md table{border-collapse:collapse;font-size:15px;min-width:100%}
+.md th,.md td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+.md tr:last-child td{border-bottom:none}
+.md th{font-family:var(--head);font-size:12.5px;font-weight:700;color:var(--muted);background:var(--field)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:26px}
+.card{border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--field)}
+.card h3{margin:0;font-size:16.5px;font-weight:700}
+.card p{margin:0;color:var(--muted);font-size:14.5px}
+.card .btn{align-self:flex-start}
+.card .ok{font-size:14px;color:var(--accent);font-weight:600}
+
+.tabtools{display:flex;justify-content:flex-end;margin-top:20px}
+
+details.refine{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:4px 18px}
+details.refine summary{cursor:pointer;font-weight:600;padding:12px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.refine summary::-webkit-details-marker{display:none}
+details.refine summary::after{content:"+";font-size:20px;color:var(--muted);font-weight:400}
+details.refine[open] summary::after{content:"–"}
+details.refine form{padding-bottom:16px;gap:10px}
+details.refine p{margin:0;color:var(--muted);font-size:14.5px}
+
+/* Formulario en pasos */
+.link.muted{color:var(--muted);font-weight:500}
+.stepper{display:flex;flex-direction:column;gap:10px}
+.steplabels{display:flex;gap:6px;flex-wrap:wrap}
+.steplabels button{background:none;border:none;padding:4px 8px 4px 0;font-weight:600;font-size:14.5px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.steplabels button span{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:12px}
+.steplabels button.on{color:var(--fg)}
+.steplabels button.on span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.steplabels button.done span{border-color:var(--accent);color:var(--accent)}
+.steplabels button:disabled{cursor:default;opacity:.6}
+.stepper .line{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.stepper .line i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .3s ease}
+
+/* Herramientas dentro de cada video */
+.vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.ideanav{display:flex;align-items:center;gap:6px;font-size:14.5px;color:var(--muted)}
+.ideanav button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:15px;line-height:1}
+.ideanav button:disabled{opacity:.35;cursor:default}
+.ideanav b{color:var(--fg);font-weight:600}
+.vstatus{display:flex;gap:8px;flex-wrap:wrap}
+.vstatus label{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:14px;cursor:pointer;background:var(--field)}
+.vstatus input{accent-color:var(--accent);margin:0}
+.vstatus label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.vfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.vfoot small{color:var(--muted);font-size:13.5px;max-width:46ch}
+.tab .ck{color:var(--accent);font-size:12px}
+
+/* Para completar */
+.todo{border:1px solid var(--line);border-radius:12px;background:var(--field);padding:16px 18px;margin-bottom:24px}
+.todo h3{margin:0 0 4px;font-size:16.5px;font-weight:700}
+.todo p{margin:0 0 10px;color:var(--muted);font-size:14.5px}
+.todo ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.todo li label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:15px}
+.todo li input{accent-color:var(--accent);margin-top:5px}
+.todo li .where{color:var(--muted);font-size:13.5px;margin-right:6px;white-space:nowrap}
+.todo li:has(input:checked) .what{text-decoration:line-through;color:var(--muted)}
+
+@media (max-width: 560px){
+  .pair{grid-template-columns:1fr}
+  .panel{padding:20px 18px}
+  fieldset{padding:16px}
+}
+</style>
+
+<div class="page">
+  <div class="top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.8"/><path d="M10.3 9.2v5.6l4.6-2.8z" fill="var(--accent)"/></svg></span>
+      <div><b>Estratega de Reels</b><small>Guiones de TikTok e Instagram para tiendas de Uruguay</small></div>
+    </div>
+  </div>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- VISTA 1: formulario de la tienda -->
+  <section id="viewForm" hidden>
+    <form id="formPlan" novalidate>
+      <div class="intro">
+        <button type="button" class="link" id="backFromForm" hidden>← Volver a mi semana</button>
+        <h1 id="formTitle">Contanos de tu tienda</h1>
+        <p>Con tus respuestas armamos una semana de contenido: 5 guiones listos para grabar con el celular, con descripción y hashtags. Respondé lo que sepas; lo que quede vacío lo completamos y te lo marcamos para que lo revises.</p>
+        <div class="introrow"><button type="button" class="link" id="exampleBtn">Completar con un ejemplo (Mosca Hnos)</button><button type="button" class="link muted" id="clearBtn">Vaciar formulario</button></div>
+      </div>
+
+
+      <div class="stepper">
+        <div class="steplabels" id="steplabels">
+          <button type="button" data-go="0"><span>1</span>Tu tienda</button>
+          <button type="button" data-go="1"><span>2</span>Tus clientes</button>
+          <button type="button" data-go="2"><span>3</span>Tus redes</button>
+          <button type="button" data-go="3"><span>4</span>Esta semana</button>
+        </div>
+        <div class="line"><i id="stepBar"></i></div>
+      </div>
+      <fieldset class="step" data-step="0">
+        <legend>Tu tienda</legend>
+        <div class="field">
+          <span class="q">¿Cómo se llama tu tienda y cómo te dice la gente?<span class="req">obligatorio</span></span>
+          <div class="pair">
+            <input type="text" id="f_nombre" placeholder="Papelería Las Hojas" aria-label="Nombre de la tienda">
+            <input type="text" id="f_apodo" placeholder="Le dicen: Las Hojas" aria-label="Cómo le dice la gente">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f_productos">¿Qué vendés? Productos principales, precio y cómo son<span class="req">obligatorio</span></label>
+          <textarea id="f_productos" rows="5" placeholder="Cuaderno artesanal A5, tapa de cartón — $450&#10;Agenda semanal con stickers — $890"></textarea>
+          <small>Uno por línea. Contá solo lo que es cierto: no inventamos características.</small>
+        </div>
+        <div class="field">
+          <label for="f_masvendidos">¿Cuáles son los que más se venden?</label>
+          <input type="text" id="f_masvendidos" placeholder="Las agendas semanales">
+        </div>
+        <div class="field">
+          <label for="f_diferencial">¿Qué te hace distinto de otras tiendas parecidas?</label>
+          <textarea id="f_diferencial" rows="2" placeholder="Todo hecho a mano, envío en el día"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" data-step="1" hidden>
+        <legend>Tus clientes</legend>
+        <div class="field">
+          <label for="f_publico">¿Quién te compra?</label>
+          <textarea id="f_publico" rows="2" placeholder="Mujeres de 20 a 35, de Montevideo, compran para regalar"></textarea>
+        </div>
+        <div class="field">
+          <span class="q">¿Cómo le hablás a tus clientes?</span>
+          <div class="chips" id="f_tono">
+            <label><input type="checkbox" value="Formal">Formal</label>
+            <label><input type="checkbox" value="Cercano">Cercano</label>
+            <label><input type="checkbox" value="Amigable">Amigable</label>
+            <label><input type="checkbox" value="Con humor">Con humor</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="q">¿Cómo te compran?</span>
+          <div class="chips" id="f_canales">
+            <label><input type="checkbox" value="WhatsApp">WhatsApp</label>
+            <label><input type="checkbox" value="Web">Web</label>
+            <label><input type="checkbox" value="Instagram">Instagram</label>
+            <label><input type="checkbox" value="Local físico">Local físico</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" data-step="2" hidden>
+        <legend>Tus redes</legend>
+        <div class="field">
+          <label for="f_redes">¿En qué redes estás, cuántos seguidores tenés y usás algún hashtag propio?</label>
+          <input type="text" id="f_redes" placeholder="Instagram 1.200, TikTok 300 · #lashojasuy">
+        </div>
+        <div class="field">
+          <label for="f_tiempo">¿Cuánto tiempo por semana podés dedicarle a grabar? ¿Quién graba?</label>
+          <input type="text" id="f_tiempo" placeholder="2 horas, graba la dueña">
+        </div>
+        <div class="field">
+          <label for="f_experiencia">¿Ya probaste hacer videos? ¿Qué te funcionó y qué no?</label>
+          <textarea id="f_experiencia" rows="2" placeholder="Los de mostrar el empaque anduvieron bien, los de precios no"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset class="step" data-step="3" hidden>
+        <legend>Esta semana</legend>
+        <div class="field">
+          <label for="f_objetivo">¿Qué querés lograr ahora?</label>
+          <input type="text" id="f_objetivo" placeholder="Vender más, más seguidores, que te conozcan…">
+        </div>
+        <div class="field">
+          <label for="f_fecha">¿Se viene alguna fecha importante para tu rubro?</label>
+          <input type="text" id="f_fecha" placeholder="Día de la Madre, Navidad, vuelta a clases…">
+        </div>
+        <div class="field">
+          <label for="f_resumen">¿Ya usaste el estratega? Pegá tu Resumen de aprendizajes<span class="req">opcional</span></label>
+          <textarea id="f_resumen" rows="3" placeholder="RESUMEN DE APRENDIZAJES – …"></textarea>
+          <small>Así la nueva semana se arma con lo que ya sabemos que funciona.</small>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" class="btn" id="stepPrev">← Anterior</button>
+        <button type="submit" class="btn primary" id="stepNext">Siguiente →</button>
+        <button type="submit" class="btn primary" id="genBtn" disabled hidden>Generar mi semana</button>
+        <span class="formmsg" id="formmsg" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <!-- VISTA 2: la semana en pestañas -->
+  <section id="viewWeek" hidden>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="weekhead">
+        <div>
+          <h1 id="weekTitle">Tu semana</h1>
+          <p id="weekSub"></p>
+        </div>
+        <div class="headbtns">
+          <button type="button" class="btn small" id="stopBtn" hidden>Detener</button>
+          <button type="button" class="btn small" id="editBtn">Volver al formulario</button>
+        </div>
+      </div>
+
+      <div class="progress" id="progress" hidden>
+        <div class="line"><i id="progBar"></i></div>
+        <div class="txt"><span id="progTxt">Preparando tu semana…</span><span id="progCount"></span></div>
+      </div>
+
+      <div class="tabs" role="tablist" id="tabs" aria-label="Partes de tu semana"></div>
+
+      <div class="panel" role="tabpanel" id="panel" tabindex="-1"></div>
+
+      <div class="panelnav">
+        <button type="button" class="btn small" id="prevBtn">← Anterior</button>
+        <button type="button" class="btn small" id="nextBtn">Siguiente →</button>
+      </div>
+
+      <details class="refine" id="refineBox" hidden>
+        <summary>¿Querés cambiar algo de la semana?</summary>
+        <form id="refineForm" novalidate>
+          <p>Contanos qué cambiar y rehacemos la semana con ese ajuste.</p>
+          <textarea id="refineIn" rows="2" placeholder="Ej: el video 3 hacelo con humor, y no uses el envío gratis como tema" aria-label="Qué querés cambiar"></textarea>
+          <div class="actions"><button type="submit" class="btn" id="refineBtn" disabled>Rehacer con este cambio</button></div>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <!-- VISTA 3: formulario de resultados -->
+  <section id="viewRes" hidden>
+    <form id="formRes" novalidate>
+      <div class="intro">
+        <button type="button" class="link" id="backFromRes">← Volver a mi semana</button>
+        <h1>¿Cómo les fue a tus videos?</h1>
+        <p>Cuando pasen 7 días de publicar, subí las estadísticas de cada video. Te decimos qué funcionó, por qué, y armamos la semana siguiente.</p>
+      </div>
+      <fieldset>
+        <legend>Tus resultados</legend>
+        <div class="field">
+          <label for="r_resumen">Resumen de aprendizajes de la semana anterior<span class="req">obligatorio</span></label>
+          <textarea id="r_resumen" rows="5" placeholder="RESUMEN DE APRENDIZAJES – Mosca Hnos – Semana 1&#10;- Tienda: …"></textarea>
+          <small>Si armaste la semana en esta página, ya está completado.</small>
+        </div>
+        <div class="field">
+          <span class="q">Capturas de las estadísticas de cada video</span>
+          <div class="drop" id="drop" role="button" tabindex="0">Tocá para elegir las capturas o arrastralas acá</div>
+          <input type="file" id="r_files" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+          <div class="thumbs" id="thumbs"></div>
+          <small>En TikTok: los tres puntitos → Estadísticas. En Instagram: debajo del Reel → Ver estadísticas.</small>
+        </div>
+        <div class="field">
+          <label for="r_numeros">¿Preferís escribir los números?<span class="req">opcional</span></label>
+          <textarea id="r_numeros" rows="4" placeholder="Video 1: 850 vistas, 40 me gusta, 3 comentarios, 25 guardados, 6 compartidos, 2 mensajes"></textarea>
+        </div>
+      </fieldset>
+      <div class="actions">
+        <button type="submit" class="btn primary" id="anaBtn" disabled>Analizar y armar la semana siguiente</button>
+        <span class="formmsg" id="resmsg" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+</div>
+
+<!-- PROMPT 3: el "cerebro" del estratega. Se manda a la IA como instrucciones al inicio de cada conversación. -->
+<script type="text/plain" id="rules">
+QUIÉN SOS
+Sos un estratega de contenido para TikTok e Instagram Reels, especializado en tiendas chicas y de nicho de Uruguay. Trabajás con dueños que no tienen equipo ni presupuesto de marketing: todo lo que proponés se tiene que poder grabar con un celular, en el local o en una casa, sin actores profesionales.
+
+CÓMO HABLÁS
+- Español uruguayo, siempre de vos. Nunca uses "tú".
+  · Bien: elegí, mirá, contame, mandale, guardalo, conseguila, decime, tenés, sos.
+  · Mal: elige, mira, cuéntame, mándale, guárdalo, consíguela, dime, tienes, eres.
+- Esto vale para todo: tus mensajes, los textos en pantalla, la voz de los videos y las descripciones.
+- Frases cortas y palabras simples. Si usás una palabra de marketing, la explicás en pocas palabras.
+- Revisá la ortografía antes de entregar.
+
+EN QUÉ ETAPA ESTÁS
+Decidí la etapa según lo que te mande el usuario:
+- Si es el primer mensaje y no hay datos de la tienda → BIENVENIDA y ETAPA 1.
+- Si el usuario pega un "RESUMEN DE APRENDIZAJES" → no repitas preguntas, pasá a la ETAPA 2 usando ese resumen.
+- Si el usuario manda capturas de estadísticas, links de videos o números de resultados → ETAPA 3.
+- Si no queda claro → preguntá qué necesita.
+
+----------------------------------------
+BIENVENIDA
+----------------------------------------
+En el primer mensaje, presentate en 2 o 3 líneas: qué hacés (armás una semana de contenido con 5 guiones para TikTok y Reels), qué le vas a entregar y que solo necesitás que responda unas preguntas sobre su tienda. Después hacé las preguntas de la Etapa 1.
+
+----------------------------------------
+ETAPA 1: CONOCER LA TIENDA
+----------------------------------------
+Hacé estas preguntas todas juntas, numeradas, con un ejemplo corto entre paréntesis. Aclarale: "Respondé lo que sepas. Lo que falte, lo completo yo y te lo marco para que lo corrijas."
+
+1. ¿Cómo se llama tu tienda y cómo te dice la gente? (ej: "Papelería Las Hojas", pero todos le dicen "Las Hojas")
+2. ¿Qué vendés? Nombrá tus productos principales con su precio y contá brevemente cómo son. (ej: cuaderno artesanal A5 tapa de cartón $450; agenda semanal con stickers $890)
+3. ¿Cuáles son los que más se venden?
+4. ¿Qué te hace distinto de otras tiendas parecidas? (ej: todo hecho a mano, envío en el día)
+5. ¿Quién te compra? (edad, zona, para qué lo compran: para regalar, para usar ellos)
+6. ¿Cómo le hablás a tus clientes? (formal, cercano, con humor)
+7. ¿En qué redes estás y cuántos seguidores tenés más o menos? ¿Usás algún hashtag propio?
+8. ¿Cuánto tiempo por semana podés dedicarle a grabar? ¿Quién graba?
+9. ¿Qué querés lograr ahora? (vender más, más seguidores, que te conozcan, una fecha especial)
+10. ¿Cómo te compran? (WhatsApp, web, Instagram, local)
+11. ¿Ya probaste hacer videos? ¿Qué te funcionó y qué no?
+12. ¿Se viene alguna fecha importante para tu rubro? (Día de la Madre, Navidad, vuelta a clases, aniversario de la tienda)
+
+Si faltan datos, completalos con supuestos razonables. Nunca inventes precios ni productos: si falta eso, preguntalo antes de seguir.
+
+----------------------------------------
+ETAPA 2: EL PLAN DE LA SEMANA
+----------------------------------------
+Entregá SIEMPRE 5 guiones, uno por día de lunes a viernes, en este orden:
+
+A) LO QUE SUPUSE
+"Lo que supuse (corregime si algo no es así):"
+- Poné una línea por CADA pregunta que la tienda no respondió o respondió con "no sé", aunque ese dato no lo hayas usado en el plan. Decí qué supusiste o, si no lo necesitaste, "no lo usé en este plan".
+- Sumá cualquier otro dato que hayas completado por tu cuenta.
+- No pongas acá lo que la tienda sí te dijo.
+
+B) TABLA RESUMEN: Día | Tema del video | Ángulo | Formato | Tipo de gancho | Objetivo
+
+C) DÍA DE GRABACIÓN
+Si la tienda tiene poco tiempo para grabar, armá una lista ordenada para grabar los 5 videos en una sola tarde, agrupando las tomas que se hacen en el mismo lugar.
+
+D) UN GUION POR VIDEO, en bloques (no en tablas largas, porque se lee en el celular):
+
+VIDEO [número] – [Título]
+Formato: [...] | Duración: [entre 20 y 45 segundos] | Producto: [...]
+Objetivo: [guardados / compartidos / comentarios / ventas]
+Ángulo: [...] — Pregunta que responde: [...]
+Tipo de gancho: [...]
+Por qué atrapa: [una línea]
+
+GANCHO (0 a 3 segundos)
+- Qué se ve:
+- Texto en pantalla:
+- Voz:
+
+VALOR (desarrollo)
+- Qué se ve:
+- Texto en pantalla:
+- Voz:
+
+CTA (cierre)
+- Qué se ve:
+- Texto en pantalla:
+- Voz:
+
+Lista de tomas: [3 a 5 tomas concretas para grabar. Ej: "plano cerca de las manos envolviendo el producto"]
+Audio: [tipo de audio y cómo buscarlo en la app]
+Descripción para publicar: [...]
+Hashtags: [6 a 8]
+
+REGLAS DE LOS GUIONES
+- Todos siguen GANCHO → VALOR → CTA.
+- El gancho funciona sin sonido: el texto en pantalla cuenta la historia solo.
+- Los 5 videos tienen 5 tipos de gancho distintos. Tipos posibles:
+  · Error común ("el error que todos cometen con...")
+  · Pregunta
+  · Antes y después
+  · Dato sorprendente
+  · POV
+  · "No sabías que..."
+  · Respuesta a un comentario
+  · Desafío o comparación
+  · Lista ("3 cosas que...")
+- Los 5 videos tienen 5 ÁNGULOS distintos. El ángulo es la necesidad o pregunta del cliente que el video responde, no las palabras que usa. Elegí 5 ángulos diferentes de esta lista:
+  · Elegir o comparar ("¿cuál me llevo?", "¿cuál es para mí?", "¿qué diferencia hay?")
+  · Cómo se usa ("¿cómo lo uso?", demostración real del producto en uso)
+  · Detrás de escena (cómo trabaja la tienda: armado de pedidos, llegada de mercadería, el local)
+  · Regalo u ocasión ("¿qué regalo?", una fecha especial)
+  · Cliente real (testimonio, pedido de un cliente, respuesta a un comentario)
+  · Situación con humor (algo que le pasa al público y con lo que se identifica)
+  · Dato o consejo del rubro (algo útil que enseña, aunque no se compre nada)
+  · Cómo comprar (envíos, formas de pago, dónde está el local)
+- Dos videos tienen el MISMO ángulo aunque cambien las palabras, el producto o el gancho. Ejemplo: "¿qué agenda va con tu personalidad?" y "no sé cuál agenda elegir" son el mismo ángulo (elegir), y no pueden estar en la misma semana.
+- No repitas el mismo beneficio (ej: el envío) como mensaje principal en dos videos.
+- No repitas el mismo formato en la semana. Formatos: educativo o consejos, proceso o detrás de escena, humor o tendencia, guía de compra, detalle del producto, antes y después, respuesta a un comentario, testimonio de cliente, idea de regalo.
+- Cada video tiene UN objetivo y su CTA va con ese objetivo:
+  · Guardados → "guardalo para después"
+  · Compartidos → "mandaselo a alguien que..."
+  · Comentarios → una pregunta fácil de responder
+  · Ventas → "escribinos por WhatsApp" (o el canal que use la tienda)
+- Si hay una fecha especial cerca, al menos un video tiene que aprovecharla.
+- La descripción empieza con la palabra que la gente buscaría en TikTok o Instagram (ej: "Regalo para el Día de la Madre en Montevideo...").
+- No inventes canciones ni audios en tendencia: no sabés qué está sonando esta semana. Sugerí el tipo de audio (ej: "audio tranquilo tipo lo-fi" o "un audio en tendencia de humor") y explicá cómo encontrarlo: en TikTok, desde la sección de sonidos; en Instagram, desde la lupa de audios de Reels.
+
+REGLAS DE LOS PRODUCTOS Y BENEFICIOS
+- Describí los productos solo con lo que te contó la tienda.
+- Si para el guion necesitás un detalle que no sabés (qué tiene por dentro, materiales, tamaño, funciones), no lo inventes: escribí [COMPLETAR: qué detalle falta] para que la tienda lo llene.
+- Si pusiste [COMPLETAR] sobre algo, ese algo no puede aparecer descrito en ninguna otra parte del guion: ni en la voz, ni en el texto en pantalla, ni en la descripción.
+- No uses adjetivos sobre el producto que la tienda no dijo (ej: "superdelicada", "supercompleta", "de excelente calidad"). Podés usar palabras que describan la emoción del cliente ("ideal para regalar") pero no características del producto.
+- Escribí los beneficios exactamente como los dijo la tienda. No los combines ni les agregues condiciones (ej: si dijo "envío a todo el país" y "envío gratis en compras de más de $3.500", no escribas "envío gratis a todo el país").
+- No uses frases de urgencia ("se agotan", "vuelan", "últimas unidades", "por tiempo limitado") salvo que la tienda te haya dicho que es así.
+
+REGLAS DE LOS HASHTAGS
+Cada video lleva de 6 a 8 hashtags, en esta mezcla:
+- De marca (siempre, en todos los videos): el nombre de la tienda junto y sin espacios, y también el nombre con el que la conoce la gente si es distinto (ej: #moscahnos y #mosca). Si la tienda tiene un hashtag propio, sumalo.
+- Populares del rubro (2 o 3): palabras simples que mucha gente usa y busca, relacionadas con el producto o la categoría (ej: #agenda, #papeleria, #regalos). Preferí palabras cortas y comunes a frases largas.
+- De nicho (1 o 2): más específicos del producto o del público (ej: #agenda2027, #organizacion).
+- Local (1 o 2): #uruguay y/o #montevideo, o la ciudad de la tienda.
+- No inventes hashtags raros ni digas que un hashtag es "viral" o "en tendencia": no podés saber cuáles lo son esta semana.
+
+REVISIÓN FINAL (obligatoria, antes de entregar el plan)
+Repasá todo el plan con esta lista y corregí lo que falle. No muestres la lista ni la revisión: entregá solo el plan ya corregido.
+1. ¿Cada pregunta sin responder o con "no sé" está en "Lo que supuse"?
+2. ¿Hay alguna palabra de "tú" (tienes, eres, dime, mira, elige, puedes, quieres)? Cambiala a vos.
+3. ¿Hay frases de urgencia (vuelan, se agotan, últimas, ya)? Sacalas.
+4. ¿Algún [COMPLETAR] aparece descrito en otro lugar del guion? Sacá esa descripción.
+5. ¿Hay adjetivos sobre el producto que la tienda no dijo? Sacalos.
+6. ¿Los beneficios están escritos exactamente como los dijo la tienda?
+7. Escribí para vos, en una frase, la pregunta del cliente que responde cada video. ¿Hay dos preguntas parecidas o dos videos con el mismo ángulo, tipo de gancho, formato o tema principal? Cambiá uno por un ángulo de la lista que no usaste.
+8. ¿La tabla resumen coincide con los guiones (tema, formato, gancho y objetivo)?
+9. ¿Todos los videos tienen los hashtags de marca?
+10. ¿Hay errores de ortografía o de tipeo?
+
+Al final del plan, explicale a la tienda cómo mandarte los resultados cuando pasen 7 días de publicados los videos:
+"Abrí cada video en tu celular, tocá 'Ver estadísticas' (en TikTok: los tres puntitos → Estadísticas; en Instagram: debajo del Reel → Ver estadísticas) y mandame una captura de pantalla de cada uno. Si querés, sumá el link del video para que sepa cuál es cuál."
+
+----------------------------------------
+ETAPA 3: MEDIR Y AJUSTAR
+----------------------------------------
+CÓMO RECIBÍS LOS RESULTADOS
+- Lo ideal: capturas de pantalla de las estadísticas de cada video. Leé los números de la imagen y armá vos la tabla: Video | Vistas | Me gusta | Comentarios | Guardados | Compartidos | Mensajes o ventas.
+- Si te mandan solo un link: nunca inventes números. Si podés abrirlo y ver datos, usalos y aclarales que faltan guardados y compartidos porque son privados. Si no podés abrirlo, decilo y pedí la captura.
+- Si un número no se lee bien en la captura, preguntá antes de usarlo.
+- Antes de analizar, mostrá la tabla que armaste y pedí que confirmen que los números están bien.
+
+CÓMO ANALIZÁS
+1. Calculá el promedio de vistas de la semana. Un video funcionó si superó ese promedio. Compará siempre contra la propia tienda, nunca contra números generales: una cuenta chica con 500 vistas puede estar yendo bien.
+2. Juzgá cada video según su objetivo: un video de guardados se mide por los guardados, uno de ventas por los mensajes o ventas.
+3. Explicá en palabras simples qué pasó:
+   - Pocas vistas → el gancho no atrapó o el tema no interesó.
+   - Muchas vistas pero pocas acciones → atrapó, pero el CTA no fue claro.
+   - Muchos guardados o compartidos → el tema le sirve a la gente: hay que repetirlo.
+4. Fijate qué tipo de gancho y qué formato tuvieron los videos que mejor anduvieron.
+5. Mostrá:
+   a. Tabla: Video | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos
+   b. Las 3 cosas más importantes de esta semana.
+   c. El nuevo plan de 5 videos (como en la Etapa 2, con su revisión final), con la mayoría basados en lo que funcionó y al menos uno probando algo nuevo. Marcá qué cambiaste y por qué.
+
+----------------------------------------
+RESUMEN DE APRENDIZAJES
+----------------------------------------
+Al terminar cada plan o análisis, cerrá con este bloque y decile a la tienda que lo guarde y lo pegue la próxima vez que use el chat:
+
+RESUMEN DE APRENDIZAJES – [nombre de la tienda] – Semana [número]
+- Tienda: [nombre y cómo le dicen, qué vende, diferencial, público, tono, canal de venta]
+- Beneficios (tal como los dijo la tienda): [...]
+- Hashtags de marca: [...]
+- Tiempo para grabar: [...]
+- Datos que siguen sin confirmar: [todo lo de "Lo que supuse" y los COMPLETAR pendientes]
+- Formatos que funcionan: [...]
+- Formatos en prueba: [...]
+- Formatos descartados: [...]
+- Tipos de gancho que anduvieron mejor: [...]
+- Tipos de gancho que no anduvieron: [...]
+- Promedio de vistas de la cuenta: [...]
+- Próximo objetivo: [...]
+
+REGLAS QUE NUNCA ROMPÉS
+- No inventes precios, productos, características ni beneficios de la tienda.
+- Nunca inventes resultados de videos: solo usás números que te mandaron o que pudiste ver.
+- No prometas que un video se va a hacer viral.
+- Si los datos son pocos para sacar conclusiones, decilo y pedí otra semana de resultados.
+- Si te piden algo que no es contenido para redes, respondé breve y volvé al plan.
+- Si un resultado contradice lo que esperabas, decilo con honestidad y ajustá.
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  const RULES = document.getElementById("rules").textContent.trim();
+  const $ = (id) => document.getElementById(id);
+  const KEY = "estratega-reels-v3";
+
+  // ---------- instrucciones extra para la página ----------
+  const INTRO =
+    "Estas son tus instrucciones. Funcionás dentro de una página web llamada \"Estratega de Reels\" que usan tiendas de Uruguay. " +
+    "La tienda NO chatea con vos: completa un formulario y la página te manda sus respuestas. No saludes como en un chat, no te presentes y no hagas las preguntas de la Etapa 1. " +
+    "La tienda no te puede responder antes de que termines: si algo falta, va en \"Lo que supuse\" o en [COMPLETAR: ...].\n\n" +
+    "===== INSTRUCCIONES DEL ESTRATEGA =====\n\n";
+
+  const FORMAT_COMMON =
+    "===VIDEO 1===\n===VIDEO 2===\n===VIDEO 3===\n===VIDEO 4===\n===VIDEO 5===\n" +
+    "Un guion por sección. Empezá con \"### [Título del video]\" y debajo una línea con: Ángulo · Formato · Duración · Producto · Objetivo · Tipo de gancho. Después \"Pregunta que responde: ...\" y \"Por qué atrapa: ...\".\n" +
+    "Luego estos subtítulos, cada uno con viñetas \"Qué se ve\", \"Texto en pantalla\" y \"Voz\": \"#### Gancho (0 a 3 segundos)\", \"#### Valor\", \"#### CTA (cierre)\".\n" +
+    "Luego \"#### Para grabar\" (lista de tomas y audio) y \"#### Para publicar\" (descripción y hashtags).\n" +
+    "===CIERRE===\n" +
+    "\"### Cómo medir tus resultados\": explicá en pocas líneas qué hacer cuando pasen 7 días de publicados los videos: abrir cada video, tocar Ver estadísticas (en TikTok: los tres puntitos → Estadísticas; en Instagram: debajo del Reel → Ver estadísticas), sacar una captura de cada uno y subirlas en esta misma página con el botón \"Analizar mis resultados\", junto con el Resumen de aprendizajes. Contá qué vas a mirar (vistas contra el promedio de la propia cuenta, y cada video según su objetivo).\n" +
+    "Después \"### Resumen de aprendizajes\" con el bloque RESUMEN DE APRENDIZAJES completo dentro de un bloque de código (```), y una línea pidiendo que lo guarden.\n\n" +
+    "Usá Markdown (###, ####, negritas, viñetas y tablas). No escribas los marcadores en ningún otro lugar ni agregues secciones.";
+
+  const FORMAT_PLAN =
+    "\n\n===== FORMATO DE ENTREGA (obligatorio; la página arma una pestaña por sección) =====\n" +
+    "Este formato reemplaza el orden A-B-C-D de la Etapa 2, pero todo el contenido de A, B, C y D tiene que estar. Empezá directamente con el primer marcador, sin texto antes. Cada marcador va solo en su línea:\n" +
+    "===INTRODUCCION===\n" +
+    "Dos o tres líneas cálidas con el nombre de la tienda y de qué va la semana. Después \"### Lo que supuse\" (A).\n" +
+    "===RESUMEN===\n" +
+    "\"### La semana\" con la tabla resumen (B), una fila por video en orden (Video 1 = primera fila), columnas Día | Tema del video | Ángulo | Formato | Tipo de gancho | Objetivo. Después \"### Día de grabación\" (C).\n" + FORMAT_COMMON;
+
+  const FORMAT_ANALYSIS =
+    "\n\n===== FORMATO DE ENTREGA (obligatorio; la página arma una pestaña por sección) =====\n" +
+    "Empezá directamente con el primer marcador, sin texto antes. Cada marcador va solo en su línea:\n" +
+    "===ANALISIS===\n" +
+    "\"### Los números que leí\" con la tabla de cada video (marcá con \"?\" los que no se lean bien y aclaralo). \"### Qué funcionó y qué no\" con la tabla Video | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos. \"### Lo más importante de esta semana\" con 3 puntos. \"### Qué cambia en la semana nueva\". Si supusiste algo, \"### Lo que supuse\".\n" +
+    "===RESUMEN===\n" +
+    "\"### La semana\" con la tabla resumen del nuevo plan, una fila por video en orden, columnas Día | Tema del video | Ángulo | Formato | Tipo de gancho | Objetivo, y \"### Día de grabación\" si corresponde.\n" + FORMAT_COMMON;
+
+  const PLAN_TABS = [["INTRODUCCION","Introducción"],["RESUMEN","Resumen de la semana"],["VIDEO 1","Video 1"],["VIDEO 2","Video 2"],["VIDEO 3","Video 3"],["VIDEO 4","Video 4"],["VIDEO 5","Video 5"],["CIERRE","Cierre"]];
+  const ANALYSIS_TABS = [["ANALISIS","Análisis de resultados"]].concat(PLAN_TABS.slice(1));
+
+  const FIELDS = ["f_nombre","f_apodo","f_productos","f_masvendidos","f_diferencial","f_publico","f_redes","f_tiempo","f_objetivo","f_experiencia","f_fecha","f_resumen","r_resumen","r_numeros"];
+
+  const EXAMPLE = {
+    f_nombre: "Mosca Hnos", f_apodo: "Mosca",
+    f_productos: "Somos papelería, librería y juguetería. Para estos videos quiero enfocarme en papelería y agendas.\n- Agenda Pocket 2027: tamaño bolsillo, en amarillo o rosa. $490\n- Agenda 2027 Astro: diaria, en gris o rosa. $690\n- Agenda Hábitos 2027 de Florencia Dafine Raele. $890\n- Agenda Astrológica 2027 Joaquina Astral, diseño de lunas. $990\n- Agenda El Principito 2027: anillada, en blanco o azul. $1.090\n- Agenda Paulo Coelho 2027 Instantes: anillada, con diseño de árboles o de colibrí. $1.090",
+    f_masvendidos: "Ahora lo que más se mueve son las agendas 2027, que acaban de llegar.",
+    f_diferencial: "Tenemos muchísima variedad, varias tiendas, envío a todo el país, envío en el día si comprás antes de las 14 hs y envío gratis en compras de más de $3.500. También tenemos un club de beneficios.",
+    f_publico: "Sobre todo mujeres de 18 a 40, estudiantes y gente que trabaja, de Montevideo y del interior. Las agendas las compran para ellas y también para regalar.",
+    f_redes: "Instagram y TikTok. No sé bien cuántos seguidores. Hashtag propio no sé.",
+    f_tiempo: "No sé, no tenemos mucho tiempo.",
+    f_objetivo: "Que la gente sepa que llegaron las agendas 2027 y vender más.",
+    f_experiencia: "No sé.", f_fecha: "Fin de año y Navidad.", f_resumen: "",
+    tono: ["Cercano","Amigable"], canales: ["Web","Instagram","Local físico"]
+  };
+
+  // ---------- estado ----------
+  let sample = null, downloads = null, ready = false, busy = false, ctl = null, imgLimits = null, blocked = false;
+  let st = { view: "form", mode: "plan", text: "", conv: [], store: "", date: "", tab: 0, done: false, step: 0, ideas: {}, status: {}, todo: {} };
+  let altBusy = null; // video que se está regenerando
+  let refine = null;   // cambio en curso: {text, out, current}
+  let files = [];
+  let userPickedTab = false;
+
+  function tabsDef(){ return st.mode === "analysis" ? ANALYSIS_TABS : PLAN_TABS; }
+
+  // ---------- guardado en este navegador ----------
+  function checked(id){ return [...document.querySelectorAll("#" + id + " input:checked")].map(i => i.value); }
+  function setChecked(id, vals){ document.querySelectorAll("#" + id + " input").forEach(i => { i.checked = (vals || []).includes(i.value); }); }
+  function save(){
+    try{
+      const d = Object.assign({}, st, {tono: checked("f_tono"), canales: checked("f_canales")});
+      FIELDS.forEach(f => d[f] = $(f).value);
+      localStorage.setItem(KEY, JSON.stringify(d));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      const d = JSON.parse(localStorage.getItem(KEY) || "null");
+      if (!d) return;
+      FIELDS.forEach(f => { if (typeof d[f] === "string") $(f).value = d[f]; });
+      setChecked("f_tono", d.tono); setChecked("f_canales", d.canales);
+      ["view","mode","text","store","date"].forEach(k => { if (typeof d[k] === "string") st[k] = d[k]; });
+      if (Array.isArray(d.conv)) st.conv = d.conv;
+      if (typeof d.tab === "number") st.tab = d.tab;
+      if (typeof d.step === "number") st.step = d.step;
+      ["ideas","status","todo"].forEach(k => { if (d[k] && typeof d[k] === "object") st[k] = d[k]; });
+      st.done = !!d.done;
+      if (st.view !== "form" && !st.text) st.view = "form";
+      if (st.view === "week" && !st.done) st.done = true; // una generación cortada al recargar queda como está
+    }catch(e){}
+  }
+
+  // ---------- markdown ----------
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+  function mdHTML(text){
+    let html;
+    if (window.marked && window.DOMPurify){
+      try{ html = window.DOMPurify.sanitize(window.marked.parse(text, {gfm:true, breaks:true})); }catch(e){}
+    }
+    if (html === undefined) html = "<p>" + esc(text).replace(/\n/g, "<br>") + "</p>";
+    return html.replace(/\[COMPLETAR:?([^\]]*)\]/g, (m, x) => "<mark>Completar:" + x + "</mark>");
+  }
+  function paintMd(el, text){
+    el.innerHTML = mdHTML(text);
+    el.querySelectorAll("table").forEach(t => { const w = document.createElement("div"); w.className = "tbl"; t.replaceWith(w); w.appendChild(t); });
+  }
+
+  // ---------- separar la respuesta en pestañas ----------
+  function norm(s){ return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase().replace(/\s+/g, " ").trim(); }
+  function sections(text){
+    const out = {}; const re = /^[ \t]*={3,}[ \t]*([A-Za-zÁÉÍÓÚáéíóúÑñ0-9 ]+?)[ \t]*={3,}[ \t]*$/gm;
+    const marks = []; let m;
+    while ((m = re.exec(text))) marks.push({key: norm(m[1]), start: m.index, end: re.lastIndex});
+    if (!marks.length){ if (text.trim()) out[tabsDef()[0][0]] = text.trim(); return {out, current: tabsDef()[0][0]}; }
+    marks.forEach((mk, i) => {
+      const body = text.slice(mk.end, i + 1 < marks.length ? marks[i+1].start : text.length).trim();
+      const key = mk.key === "INTRODUCCION" && st.mode === "analysis" ? "ANALISIS" : mk.key;
+      out[key] = (out[key] ? out[key] + "\n\n" : "") + body;
+    });
+    return {out, current: marks[marks.length - 1].key};
+  }
+
+  function tableOf(md){
+    const lines = md.split("\n");
+    let i = lines.findIndex(l => /^\s*\|.*\|\s*$/.test(l));
+    if (i < 0) return null;
+    const start = i; while (i < lines.length && /^\s*\|/.test(lines[i])) i++;
+    const tbl = lines.slice(start, i);
+    if (tbl.length < 3) return null;
+    return {lines, start, end: i, head: tbl.slice(0, 2), rows: tbl.slice(2)};
+  }
+  function cells(row){ return row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(c => c.trim()); }
+  function baseRow(n){ const t = tableOf(sections(st.text).out.RESUMEN || ""); return t && t.rows[n - 1] ? t.rows[n - 1] : null; }
+  function resumenView(md){
+    const t = tableOf(md); if (!t) return md;
+    let changed = false;
+    const rows = t.rows.slice();
+    for (let n = 1; n <= 5; n++){
+      const I = st.ideas["VIDEO " + n];
+      if (!I || !I.rows || !I.rows[I.seen] || !rows[n - 1] || I.rows[I.seen] === rows[n - 1]) continue;
+      const base = cells(rows[n - 1]), nr = cells(I.rows[I.seen]);
+      if (nr.length === base.length) nr[0] = base[0];
+      rows[n - 1] = "| " + nr.join(" | ") + " |"; changed = true;
+    }
+    if (!changed) return md;
+    return t.lines.slice(0, t.start).concat(t.head, rows, ["", "*La tabla está actualizada con las ideas que elegiste en cada video.*"], t.lines.slice(t.end)).join("\n");
+  }
+  function view(){
+    const r = sections(st.text);
+    Object.keys(st.ideas).forEach(k => { const I = st.ideas[k]; if (I && I.list && I.list[I.seen]) r.out[k] = I.list[I.seen]; });
+    if (r.out.RESUMEN) r.out.RESUMEN = resumenView(r.out.RESUMEN);
+    return r;
+  }
+  function compose(out){ return tabsDef().filter(([k]) => out[k]).map(([k]) => "===" + k + "===\n" + out[k]).join("\n\n"); }
+  function todos(out){
+    const items = [];
+    tabsDef().forEach(([k, label]) => {
+      if (!out[k] || !/^VIDEO/.test(k)) return;
+      const re = /\[COMPLETAR:?\s*([^\]]*)\]/g; let m;
+      while ((m = re.exec(out[k]))){ const what = m[1].trim(); if (what && !items.some(i => i.where === label && i.what === what)) items.push({where: label, what, id: label + "|" + what}); }
+    });
+    return items;
+  }
+
+  function extractResumen(text){
+    const i = text.lastIndexOf("RESUMEN DE APRENDIZAJES");
+    if (i < 0) return null;
+    const lines = text.slice(i).split("\n");
+    const out = [lines[0].replace(/[*#`]/g, "").trim()];
+    for (const raw of lines.slice(1)){
+      const l = raw.trim();
+      if (l.startsWith("```")) break;
+      if (!l){ if (out.length > 1) break; else continue; }
+      if (!/^[-*•]/.test(l)) break;
+      out.push("- " + l.replace(/^[-*•]\s*/, "").replace(/\*\*/g, ""));
+    }
+    return out.length > 1 ? out.join("\n") : null;
+  }
+
+  // ---------- vistas ----------
+  function show(view){
+    st.view = view;
+    $("viewForm").hidden = view !== "form";
+    $("viewWeek").hidden = view !== "week";
+    $("viewRes").hidden = view !== "res";
+    $("backFromForm").hidden = !st.text;
+    $("formTitle").textContent = st.text ? "Tus respuestas" : "Contanos de tu tienda";
+    $("genBtn").textContent = st.text ? "Generar de nuevo con estos cambios" : "Generar mi semana";
+    if (view === "week") renderWeek();
+    if (view === "form") showStep(step1ok() ? st.step : 0);
+    save(); refreshButtons();
+    window.scrollTo({top: 0});
+  }
+  $("editBtn").onclick = () => show("form");
+  $("backFromForm").onclick = () => show("week");
+  $("backFromRes").onclick = () => show("week");
+
+  // ---------- la semana ----------
+  function renderWeek(){
+    const {out, current} = view();
+    const defs = tabsDef();
+    $("weekTitle").textContent = st.mode === "analysis" ? "Tus resultados y la semana nueva" : "La semana de " + (st.store || "tu tienda");
+    $("weekSub").textContent = st.date ? (st.mode === "analysis" ? "Analizado el " : "Armada el ") + st.date : "";
+
+    const tabs = $("tabs"); tabs.innerHTML = "";
+    const readyCount = defs.filter(([k]) => out[k]).length;
+    defs.forEach(([k, label], i) => {
+      const has = !!out[k];
+      const writing = (busy && norm(current) === k) || altBusy === k || !!(refine && refine.out[k] !== undefined && (refine.current === k || !refine.doneKeys.includes(k)));
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "tab" + (has && !writing ? " ready" : "") + (writing ? " writing" : "");
+      b.setAttribute("role", "tab"); b.id = "tab-" + i;
+      b.setAttribute("aria-selected", String(i === st.tab));
+      b.disabled = !has;
+      const s2 = st.status[k] || {};
+      b.innerHTML = '<span class="st" aria-hidden="true"></span>' + esc(label) + (s2.p ? ' <span class="ck" title="Publicado">✓✓</span>' : s2.g ? ' <span class="ck" title="Grabado">✓</span>' : "");
+      b.onclick = () => { userPickedTab = true; st.tab = i; save(); renderWeek(); $("panel").focus({preventScroll:true}); };
+      tabs.append(b);
+    });
+    if (!out[defs[st.tab] && defs[st.tab][0]]) st.tab = Math.max(0, defs.findIndex(([k]) => out[k]));
+    tabs.querySelectorAll(".tab").forEach((b, i) => b.setAttribute("aria-selected", String(i === st.tab)));
+    const sel = tabs.children[st.tab]; if (sel && sel.scrollIntoView) sel.scrollIntoView({block:"nearest", inline:"nearest"});
+
+    // progreso
+    $("progress").hidden = !busy;
+    if (altBusy) $("progress").hidden = true;
+    if (refine){
+      $("progress").hidden = false;
+      const names = defs.filter(([k]) => refine.out[k] !== undefined).map(([, l]) => l);
+      $("progTxt").textContent = names.length ? "Actualizando: " + names.join(", ") + "… Mientras tanto podés mirar las otras pestañas." : "Pensando el cambio… Mientras tanto podés mirar las pestañas.";
+      $("progCount").textContent = ""; $("progBar").style.width = names.length ? "60%" : "15%";
+    }
+    if (busy){
+      const label = (defs.find(([k]) => k === norm(current)) || [null, null])[1];
+      $("progTxt").textContent = readyCount ? "Escribiendo " + (label || "tu semana") + "…" : "Pensando tu semana… puede tardar uno o dos minutos.";
+      $("progCount").textContent = readyCount ? readyCount + " de " + defs.length : "";
+      $("progBar").style.width = Math.max(4, Math.round(readyCount / defs.length * 100)) + "%";
+    }
+
+    // panel
+    const panel = $("panel");
+    const [key, label] = defs[st.tab] || defs[0];
+    panel.setAttribute("aria-labelledby", "tab-" + st.tab);
+    panel.innerHTML = "";
+    if (!out[key]){
+      panel.innerHTML = '<div class="waiting"><b>Estamos armando tu semana</b><span>Las pestañas se van habilitando a medida que cada parte está lista.</span></div>';
+    } else {
+      if (key === "CIERRE" && !busy) panel.append(closingCards());
+      if ((key === "INTRODUCCION" || key === "ANALISIS") && !busy){ const t = todoCard(out); if (t) panel.append(t); }
+      const isVideo = /^VIDEO/.test(key);
+      if (isVideo && !busy) panel.append(videoBar(key));
+      const md = document.createElement("div"); md.className = "md";
+      if (altBusy === key && altText !== null) paintMd(md, altText || "");
+      else if (refine && refine.out[key] !== undefined) paintMd(md, refine.out[key] || "_Actualizando esta pestaña…_");
+      else paintMd(md, out[key]);
+      if (altBusy === key && !altText) md.innerHTML = '<div class="waiting"><b>Pensando otra idea para este video…</b><span>Puede tardar alrededor de un minuto.</span></div>';
+      panel.append(md);
+      if (isVideo && !busy) panel.append(videoFoot(key));
+      if (!busy && !altBusy && !refine){
+        const tt = document.createElement("div"); tt.className = "tabtools";
+        const cb = document.createElement("button"); cb.type = "button"; cb.className = "link"; cb.textContent = "Copiar esta pestaña";
+        cb.onclick = () => copyText(out[key], cb);
+        tt.append(cb); panel.append(tt);
+      }
+    }
+    $("prevBtn").disabled = st.tab === 0;
+    $("nextBtn").disabled = st.tab >= defs.length - 1 || !out[defs[st.tab + 1][0]];
+    $("prevBtn").textContent = st.tab > 0 ? "← " + defs[st.tab - 1][1] : "← Anterior";
+    $("nextBtn").textContent = st.tab < defs.length - 1 ? defs[st.tab + 1][1] + " →" : "Siguiente →";
+    $("refineBox").hidden = busy || !!altBusy || !!refine || !st.conv.length || blocked || !ready;
+    $("stopBtn").hidden = !busy && !altBusy && !refine;
+    $("editBtn").hidden = busy || !!altBusy || !!refine;
+  }
+  $("prevBtn").onclick = () => { if (st.tab > 0){ st.tab--; save(); renderWeek(); window.scrollTo({top: 0, behavior: "smooth"}); } };
+  $("nextBtn").onclick = () => { st.tab++; save(); renderWeek(); window.scrollTo({top: 0, behavior: "smooth"}); };
+
+  function videoBar(key){
+    const bar = document.createElement("div"); bar.className = "vbar";
+    const I = st.ideas[key];
+    const nav = document.createElement("div"); nav.className = "ideanav";
+    if (I && I.list.length > 1){
+      const prev = document.createElement("button"); prev.type = "button"; prev.textContent = "‹"; prev.setAttribute("aria-label", "Idea anterior");
+      const next = document.createElement("button"); next.type = "button"; next.textContent = "›"; next.setAttribute("aria-label", "Idea siguiente");
+      const lab = document.createElement("span"); lab.innerHTML = "Idea <b>" + (I.seen + 1) + "</b> de " + I.list.length;
+      prev.disabled = I.seen === 0 || !!altBusy; next.disabled = I.seen >= I.list.length - 1 || !!altBusy;
+      prev.onclick = () => { I.seen--; save(); renderWeek(); };
+      next.onclick = () => { I.seen++; save(); renderWeek(); };
+      nav.append(prev, lab, next);
+    } else {
+      nav.textContent = "Idea original";
+    }
+    const status = document.createElement("div"); status.className = "vstatus";
+    const S = st.status[key] || (st.status[key] = {g: false, p: false});
+    [["g","Grabado"],["p","Publicado"]].forEach(([k, l]) => {
+      const lb = document.createElement("label"); const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!S[k];
+      cb.onchange = () => { S[k] = cb.checked; if (k === "p" && cb.checked) S.g = true; save(); renderWeek(); };
+      lb.append(cb, document.createTextNode(l)); status.append(lb);
+    });
+    bar.append(nav, status);
+    return bar;
+  }
+  function videoFoot(key){
+    const f = document.createElement("div"); f.className = "vfoot";
+    const sm = document.createElement("small");
+    sm.textContent = "¿No te convence? Pedí otra idea solo para este video. Las ideas anteriores quedan guardadas y van al documento como historial.";
+    const b = document.createElement("button"); b.type = "button"; b.className = "btn small";
+    b.textContent = altBusy === key ? "Pensando…" : "Otra idea para este video";
+    b.disabled = !ready || blocked || busy || !!altBusy || !!refine || !st.conv.length;
+    b.onclick = () => otherIdea(key);
+    f.append(sm, b);
+    return f;
+  }
+  function todoCard(out){
+    const items = todos(out);
+    if (!items.length) return null;
+    const c = document.createElement("div"); c.className = "todo";
+    c.innerHTML = "<h3>Para completar antes de grabar</h3><p>Datos que no nos diste y que aparecen en los guiones. Marcalos a medida que los resuelvas.</p>";
+    const ul = document.createElement("ul");
+    items.forEach(it => {
+      const li = document.createElement("li"); const lb = document.createElement("label");
+      const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!st.todo[it.id];
+      cb.onchange = () => { st.todo[it.id] = cb.checked; save(); };
+      const tx = document.createElement("span"); tx.innerHTML = '<span class="where">' + esc(it.where) + '</span><span class="what">' + esc(it.what) + "</span>";
+      lb.append(cb, tx); li.append(lb); ul.append(li);
+    });
+    c.append(ul);
+    return c;
+  }
+
+  let altText = null;
+  async function otherIdea(key){
+    if (busy || altBusy || refine || !st.conv.length) return;
+    const {out} = view();
+    const original = sections(st.text).out[key];
+    if (!original) return;
+    const n = +key.replace(/\D/g, "");
+    const I = st.ideas[key] || {list: [original], seen: 0, rows: [baseRow(n)]};
+    if (!I.rows) I.rows = I.list.map((_, i) => i === 0 ? baseRow(n) : null);
+    const others = tabsDef().filter(([k]) => /^VIDEO/.test(k) && k !== key).map(([k, l]) => l + ":\n" + (out[k] || "")).join("\n\n");
+    const ask = "La tienda quiere OTRA IDEA solo para el " + key.replace("VIDEO", "Video") + ". Estas son las ideas que ya vio para ese video y no quiere repetir:\n\n" +
+      I.list.map((t, i) => "IDEA " + (i + 1) + ":\n" + t).join("\n\n") +
+      "\n\nY así quedaron los otros videos de la semana. La idea nueva tiene que tener un ÁNGULO (la pregunta del cliente que responde) distinto al de estos 4 videos y distinto al de las ideas anteriores, y tampoco puede repetir su tipo de gancho, su formato ni su tema principal:\n\n" + others +
+      "\n\nEscribí una idea nueva y distinta para ese video, cumpliendo todas las reglas y la REVISIÓN FINAL. Podés cambiar el producto, el formato o el tipo de gancho, siempre que no choque con los otros 4 videos. " +
+      "Devolvé SOLO ese guion, sin marcadores ===, empezando con \"### [Título]\" y con la misma estructura de subtítulos (#### Gancho (0 a 3 segundos), #### Valor, #### CTA (cierre), #### Para grabar, #### Para publicar). Si cambiaste el formato o el tipo de gancho, aclaralo en la línea de ficha. Al final, en una línea aparte, escribí la fila de la tabla resumen para este video, así: FILA: | Día | Tema del video | Ángulo | Formato | Tipo de gancho | Objetivo |";
+    altBusy = key; altText = ""; ctl = new AbortController();
+    $("banner").hidden = true;
+    renderWeek(); refreshButtons();
+    let last = 0;
+    try{
+      const res = await sample(st.conv.concat([{role: "user", content: ask}]), {cache: false, signal: ctl.signal, onText: ({text}) => {
+        altText = text.replace(/^\s*FILA:.*$/m, ""); const now = Date.now(); if (now - last > 250 && st.tab === tabsDef().findIndex(([k]) => k === key)){ last = now; renderWeek(); }
+      }});
+      const fila = res.text.match(/^\s*FILA:\s*(.+)$/m);
+      const clean = res.text.replace(/^\s*FILA:.*$/m, "").replace(/^[ \t]*={3,}[^\n]*={3,}[ \t]*$/gm, "").trim();
+      I.list.push(clean); I.rows.push(fila ? "| " + cells(fila[1]).join(" | ") + " |" : null); I.seen = I.list.length - 1; st.ideas[key] = I;
+      st.status[key] = {g: false, p: false};
+    }catch(e){
+      const code = e && e.code;
+      if (code && code !== "cancelled") banner(ERR[code] || ERR.upstream_error, true);
+    }finally{
+      altBusy = null; altText = null; ctl = null; save(); renderWeek(); refreshButtons();
+    }
+  }
+
+  function closingCards(){
+    const wrap = document.createElement("div"); wrap.className = "cards";
+    const c1 = document.createElement("div"); c1.className = "card";
+    c1.innerHTML = "<h3>Guardá tu semana en un documento</h3><p>Todo lo de cada pestaña, ordenado y con cada parte en una página nueva. ¿Lo querés en Google Drive? Subí el archivo a tu Drive y abrilo con Google Docs.</p>";
+    const b1 = document.createElement("button"); b1.type = "button"; b1.className = "btn primary small"; b1.textContent = "Descargar en Word (.docx)";
+    const msg = document.createElement("span"); msg.className = "ok"; msg.hidden = true;
+    b1.onclick = () => downloadDocx(b1, msg);
+    if (!downloads){ b1.disabled = true; msg.hidden = false; msg.textContent = "La descarga no está disponible en este navegador."; }
+    c1.append(b1, msg);
+    const c2 = document.createElement("div"); c2.className = "card";
+    c2.innerHTML = "<h3>¿Ya publicaste los videos?</h3><p>A los 7 días, subí las capturas de las estadísticas. Te decimos qué funcionó y armamos la semana siguiente.</p>";
+    const b2 = document.createElement("button"); b2.type = "button"; b2.className = "btn small"; b2.textContent = "Analizar mis resultados";
+    b2.onclick = () => { const r = extractResumen(st.text); if (r && !$("r_resumen").value.trim()) $("r_resumen").value = r; show("res"); };
+    c2.append(b2);
+    wrap.append(c1, c2);
+    return wrap;
+  }
+
+  // ---------- documento Word ----------
+  function xesc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ""); }
+  function run(text, f){
+    if (!text) return "";
+    let rp = "";
+    if (f.b) rp += "<w:b/>";
+    if (f.i) rp += "<w:i/>";
+    if (f.code) rp += '<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/><w:sz w:val="20"/>';
+    if (f.mark) rp += '<w:shd w:val="clear" w:color="auto" w:fill="FFF1D2"/>';
+    return "<w:r>" + (rp ? "<w:rPr>" + rp + "</w:rPr>" : "") + '<w:t xml:space="preserve">' + xesc(text) + "</w:t></w:r>";
+  }
+  function inlineRuns(node, f){
+    let x = "";
+    node.childNodes.forEach(n => {
+      if (n.nodeType === 3){ x += run(n.textContent.replace(/\s+/g, " "), f); return; }
+      if (n.nodeType !== 1) return;
+      const t = n.tagName.toLowerCase();
+      if (t === "br"){ x += "<w:r><w:br/></w:r>"; return; }
+      if (t === "ul" || t === "ol") return;
+      const g = Object.assign({}, f);
+      if (t === "strong" || t === "b") g.b = true;
+      if (t === "em" || t === "i") g.i = true;
+      if (t === "code") g.code = true;
+      if (t === "mark") g.mark = true;
+      x += inlineRuns(n, g);
+    });
+    return x;
+  }
+  function para(style, runs, extra){ return "<w:p><w:pPr>" + (style ? '<w:pStyle w:val="' + style + '"/>' : "") + (extra || "") + "</w:pPr>" + runs + "</w:p>"; }
+  function blocks(node, depth){
+    let x = "";
+    node.childNodes.forEach(n => {
+      if (n.nodeType === 3){ if (n.textContent.trim()) x += para("", run(n.textContent.trim(), {})); return; }
+      if (n.nodeType !== 1) return;
+      const t = n.tagName.toLowerCase();
+      if (t === "h1" || t === "h2" || t === "h3") x += para("Heading2", inlineRuns(n, {}));
+      else if (t === "h4" || t === "h5" || t === "h6") x += para("Heading3", inlineRuns(n, {}));
+      else if (t === "p") x += para("", inlineRuns(n, {}));
+      else if (t === "ul" || t === "ol"){
+        let k = 0;
+        n.querySelectorAll(":scope > li").forEach(li => {
+          k++;
+          const bullet = t === "ol" ? k + ". " : "• ";
+          const ind = '<w:ind w:left="' + (360 + depth * 360) + '" w:hanging="260"/>';
+          const firstP = li.querySelector(":scope > p");
+          x += para("ListText", run(bullet, {}) + inlineRuns(firstP || li, {}), ind);
+          li.querySelectorAll(":scope > ul, :scope > ol").forEach(sub => { const holder = document.createElement("div"); holder.append(sub.cloneNode(true)); x += blocks(holder, depth + 1); });
+        });
+      }
+      else if (t === "pre"){ n.textContent.replace(/\n$/, "").split("\n").forEach(l => { x += para("Code", run(l || " ", {code:true})); }); }
+      else if (t === "blockquote") x += blocks(n, depth);
+      else if (t === "table"){
+        const rows = [...n.querySelectorAll("tr")];
+        const cols = Math.max(1, ...rows.map(r => r.children.length));
+        const w = Math.floor(9000 / cols);
+        x += '<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/><w:tblBorders>' +
+          ["top","left","bottom","right","insideH","insideV"].map(b => "<w:" + b + ' w:val="single" w:sz="4" w:color="D5DCE1"/>').join("") +
+          '</w:tblBorders><w:tblCellMar><w:left w:w="90" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>' +
+          Array.from({length: cols}, () => '<w:gridCol w:w="' + w + '"/>').join("") + "</w:tblGrid>";
+        rows.forEach(r => {
+          x += "<w:tr>";
+          [...r.children].forEach(c => {
+            const head = c.tagName.toLowerCase() === "th";
+            x += '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (head ? '<w:shd w:val="clear" w:color="auto" w:fill="EEF3F2"/>' : "") + "</w:tcPr>" + para("Cell", inlineRuns(c, {b: head})) + "</w:tc>";
+          });
+          for (let i = r.children.length; i < cols; i++) x += '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/></w:tcPr>' + para("Cell", "") + "</w:tc>";
+          x += "</w:tr>";
+        });
+        x += "</w:tbl>" + para("", "");
+      }
+      else if (t === "hr") {}
+      else if (t === "div") x += blocks(n, depth);
+      else x += para("", inlineRuns(n, {}));
+    });
+    return x;
+  }
+  function buildDocx(){
+    const {out} = view();
+    const defs = tabsDef();
+    const mdBlocks = (text) => { const holder = document.createElement("div"); holder.innerHTML = mdHTML(text); return blocks(holder, 0); };
+    let body = para("Title", run(st.mode === "analysis" ? "Resultados y semana nueva" : "La semana de " + (st.store || "tu tienda"), {}));
+    body += para("Subtitle", run("Estratega de Reels · " + (st.date || ""), {}));
+    body += para("", run("Contenido: " + defs.filter(([k]) => out[k]).map(([, l]) => l).join(" · "), {}));
+    defs.forEach(([k, label]) => {
+      if (!out[k]) return;
+      body += para("Heading1", run(label, {}), "<w:pageBreakBefore/>");
+      if (k === "INTRODUCCION" || k === "ANALISIS"){
+        const items = todos(out);
+        if (items.length){
+          body += para("Heading2", run("Para completar antes de grabar", {}));
+          items.forEach(it => { body += para("ListText", run((st.todo[it.id] ? "☑ " : "☐ "), {}) + run(it.where + ": ", {b: true}) + run(it.what, {}), '<w:ind w:left="360" w:hanging="260"/>'); });
+        }
+      }
+      if (/^VIDEO/.test(k)){
+        const S = st.status[k] || {};
+        body += para("Meta", run("Estado: " + (S.p ? "publicado" : S.g ? "grabado, falta publicar" : "sin grabar"), {}));
+        const I = st.ideas[k];
+        if (I && I.list.length > 1){
+          body += para("Meta", run("Se pidieron " + I.list.length + " ideas para este video. Primero va el historial y al final la última idea vista.", {}));
+          I.list.forEach((t, i) => {
+            if (i === I.seen) return;
+            body += para("IdeaLabel", run("HISTORIAL DE IDEAS · Idea " + (i + 1) + (i === 0 ? " (original)" : ""), {}));
+            body += mdBlocks(t);
+          });
+          body += para("IdeaLabelFinal", run("ÚLTIMA IDEA VISTA · Idea " + (I.seen + 1) + (I.seen === 0 ? " (original)" : ""), {}), "<w:pageBreakBefore/>");
+        }
+      }
+      body += mdBlocks(out[k]);
+    });
+    const doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body +
+      '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1300" w:right="1300" w:bottom="1300" w:left="1300" w:header="700" w:footer="700" w:gutter="0"/></w:sectPr></w:body></w:document>';
+    const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">' +
+      '<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:color w:val="1F2B33"/><w:lang w:val="es-UY"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+      '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="2400" w:after="160"/></w:pPr><w:rPr><w:b/><w:sz w:val="52"/><w:color w:val="2F6F69"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="480"/></w:pPr><w:rPr><w:sz w:val="26"/><w:color w:val="66747E"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:after="240"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="36"/><w:color w:val="2F6F69"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="280" w:after="100"/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Heading3"><w:name w:val="heading 3"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="80"/><w:outlineLvl w:val="2"/></w:pPr><w:rPr><w:b/><w:caps/><w:sz w:val="20"/><w:color w:val="2F6F69"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="ListText"><w:name w:val="List Text"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="60"/></w:pPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Code"><w:name w:val="Code"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:after="0"/><w:shd w:val="clear" w:color="auto" w:fill="F3F6F7"/></w:pPr><w:rPr><w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/><w:sz w:val="19"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Meta"><w:name w:val="Meta"/><w:basedOn w:val="Normal"/><w:rPr><w:i/><w:color w:val="66747E"/><w:sz w:val="20"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="IdeaLabel"><w:name w:val="Idea Label"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="360" w:after="120"/><w:shd w:val="clear" w:color="auto" w:fill="EEF1F3"/></w:pPr><w:rPr><w:b/><w:sz w:val="20"/><w:color w:val="66747E"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="IdeaLabelFinal"><w:name w:val="Idea Label Final"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="120" w:after="160"/><w:shd w:val="clear" w:color="auto" w:fill="E5F0EE"/></w:pPr><w:rPr><w:b/><w:sz w:val="22"/><w:color w:val="2F6F69"/></w:rPr></w:style>' +
+      '<w:style w:type="paragraph" w:styleId="Cell"><w:name w:val="Cell"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr><w:rPr><w:sz w:val="19"/></w:rPr></w:style>' +
+      "</w:styles>";
+    const zip = new window.JSZip();
+    zip.file("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>');
+    zip.file("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+    zip.file("word/_rels/document.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+    zip.file("word/document.xml", doc);
+    zip.file("word/styles.xml", styles);
+    return zip.generateAsync({type: "uint8array", compression: "DEFLATE"});
+  }
+  async function downloadDocx(btn, msg){
+    if (!window.JSZip){ msg.hidden = false; msg.textContent = "No se pudo preparar el documento. Recargá la página y probá de nuevo."; return; }
+    btn.disabled = true; msg.hidden = false; msg.textContent = "Preparando el documento…";
+    try{
+      const bytes = await buildDocx();
+      const name = (st.mode === "analysis" ? "Resultados y semana nueva - " : "Semana de Reels - ") + (st.store || "mi tienda") + ".docx";
+      await downloads.save({filename: name.replace(/[\\/:*?"<>|]/g, ""), data: bytes});
+      msg.textContent = "Listo. Revisá tus descargas.";
+    }catch(e){
+      const c = e && e.code;
+      msg.textContent = c === "declined" ? "Descarga cancelada." : c === "rate_limited" ? "Ya hay una descarga esperando tu confirmación." : "No se pudo descargar en esta vista.";
+    }finally{ btn.disabled = false; }
+  }
+
+  // ---------- copiar ----------
+  function copyText(text, btn){
+    const label = btn.textContent;
+    const done = () => { btn.textContent = "Copiado ✓"; setTimeout(() => btn.textContent = label, 1800); };
+    const fallback = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.append(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){} setTimeout(() => ta.remove(), 50); };
+    try{ navigator.clipboard.writeText(text).then(done, fallback); }catch(e){ fallback(); }
+  }
+
+  // ---------- formulario ----------
+  const v = (id) => $(id).value.trim();
+  const orNo = (s) => s ? s : "(no respondió)";
+  function answers(){
+    const apodo = v("f_apodo");
+    let t = "RESPUESTAS DEL FORMULARIO DE LA TIENDA (lo que dice \"(no respondió)\" tratalo como \"no sé\"):\n\n";
+    t += "1. ¿Cómo se llama tu tienda y cómo te dice la gente? → " + v("f_nombre") + (apodo ? ". La gente le dice: " + apodo : ". (no respondió cómo le dice la gente)") + "\n";
+    t += "2. ¿Qué vendés? Productos, precios y cómo son →\n" + v("f_productos") + "\n";
+    t += "3. ¿Cuáles son los que más se venden? → " + orNo(v("f_masvendidos")) + "\n";
+    t += "4. ¿Qué te hace distinto? → " + orNo(v("f_diferencial")) + "\n";
+    t += "5. ¿Quién te compra? → " + orNo(v("f_publico")) + "\n";
+    t += "6. ¿Cómo le hablás a tus clientes? → " + orNo(checked("f_tono").join(", ")) + "\n";
+    t += "7. ¿En qué redes estás, cuántos seguidores y hashtag propio? → " + orNo(v("f_redes")) + "\n";
+    t += "8. ¿Cuánto tiempo por semana para grabar y quién graba? → " + orNo(v("f_tiempo")) + "\n";
+    t += "9. ¿Qué querés lograr ahora? → " + orNo(v("f_objetivo")) + "\n";
+    t += "10. ¿Cómo te compran? → " + orNo(checked("f_canales").join(", ")) + "\n";
+    t += "11. ¿Ya probaste hacer videos? ¿Qué funcionó y qué no? → " + orNo(v("f_experiencia")) + "\n";
+    t += "12. ¿Se viene alguna fecha importante? → " + orNo(v("f_fecha")) + "\n";
+    if (v("f_resumen")) t += "\nLa tienda también pegó su RESUMEN DE APRENDIZAJES anterior. Usalo para armar la semana:\n" + v("f_resumen") + "\n";
+    t += "\nArmá ahora el plan de la semana con los 5 guiones (Etapa 2), aplicando la REVISIÓN FINAL antes de entregar.";
+    return t;
+  }
+  function refreshButtons(){
+    const can = ready && !blocked && !busy && !altBusy && !refine;
+    $("genBtn").disabled = !can || !v("f_nombre") || !v("f_productos");
+    $("anaBtn").disabled = !can || !v("r_resumen") || (files.length === 0 && !v("r_numeros"));
+    $("refineBtn").disabled = !can || !v("refineIn");
+    $("formmsg").textContent = !step1ok() ? "Completá el nombre y los productos para continuar." : (busy ? "Hay una semana generándose." : "");
+    $("resmsg").textContent = !v("r_resumen") ? "Pegá el resumen de la semana anterior." : (files.length === 0 && !v("r_numeros") ? "Sumá las capturas o escribí los números." : "");
+  }
+  document.addEventListener("input", () => { refreshButtons(); save(); });
+  document.addEventListener("change", () => { refreshButtons(); save(); });
+
+  $("exampleBtn").onclick = () => {
+    Object.keys(EXAMPLE).forEach(k => { if ($(k)) $(k).value = EXAMPLE[k]; });
+    setChecked("f_tono", EXAMPLE.tono); setChecked("f_canales", EXAMPLE.canales);
+    refreshButtons(); save(); showStep(st.step);
+  };
+  let clearArmed = false;
+  $("clearBtn").onclick = () => {
+    if (!clearArmed){ clearArmed = true; $("clearBtn").textContent = "Tocá de nuevo para vaciar"; setTimeout(() => { clearArmed = false; $("clearBtn").textContent = "Vaciar formulario"; }, 3000); return; }
+    clearArmed = false; $("clearBtn").textContent = "Vaciar formulario";
+    ["f_nombre","f_apodo","f_productos","f_masvendidos","f_diferencial","f_publico","f_redes","f_tiempo","f_objetivo","f_experiencia","f_fecha","f_resumen"].forEach(f => $(f).value = "");
+    setChecked("f_tono", []); setChecked("f_canales", []);
+    refreshButtons(); save(); showStep(0);
+  };
+
+  // ---------- capturas ----------
+  function addFiles(list){
+    if (!imgLimits){ banner("En esta vista no se pueden subir imágenes. Escribí los números de cada video en el campo de abajo.", false); return; }
+    for (const f of list){
+      if (!imgLimits.mediaTypes.includes(f.type)) continue;
+      if (files.length >= imgLimits.maxCount){ banner("Podés subir hasta " + imgLimits.maxCount + " capturas por análisis.", false); break; }
+      files.push(f);
+    }
+    drawThumbs(); refreshButtons();
+  }
+  function drawThumbs(){
+    const box = $("thumbs"); box.innerHTML = "";
+    files.forEach((f, i) => {
+      const fig = document.createElement("figure");
+      const img = document.createElement("img"); img.alt = "Captura " + (i+1); img.src = URL.createObjectURL(f);
+      const x = document.createElement("button"); x.type = "button"; x.textContent = "✕"; x.setAttribute("aria-label", "Quitar captura " + (i+1));
+      x.onclick = () => { files.splice(i, 1); drawThumbs(); refreshButtons(); };
+      fig.append(img, x); box.append(fig);
+    });
+  }
+  const drop = $("drop");
+  drop.onclick = () => $("r_files").click();
+  drop.onkeydown = (e) => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("r_files").click(); } };
+  $("r_files").onchange = (e) => { addFiles(e.target.files); e.target.value = ""; };
+  drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); addFiles(e.dataTransfer.files); };
+  document.addEventListener("paste", (e) => {
+    if ($("viewRes").hidden) return;
+    const imgs = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith("image/"));
+    if (imgs.length){ e.preventDefault(); addFiles(imgs); }
+  });
+
+  // ---------- llamada a la IA (nuestro servidor, que usa Gemini) ----------
+  function banner(text, err){ const b = $("banner"); b.textContent = text; b.className = "banner" + (err ? " err" : ""); b.hidden = false; }
+  const ERR = {
+    rate_limited: "Se hicieron muchas consultas seguidas y la IA pidió una pausa. Esperá un minuto y probá de nuevo.",
+    session_expired: "El servidor no pudo conectarse con la IA. Probá de nuevo en un rato.",
+    bad_key: "La clave de la IA no es válida. Revisá la variable GEMINI_API_KEY en Render.",
+    model_not_found: "El modelo de IA configurado no existe. Revisá la variable GEMINI_MODEL en Render.",
+    image_rejected: "No pudimos leer alguna de las capturas. Probá con otra imagen (PNG o JPG).",
+    refused: "No se pudo generar una respuesta con esos datos. Revisá lo que escribiste y probá de nuevo.",
+    empty_completion: "No llegó ninguna respuesta. Probá de nuevo.",
+    prompt_too_large: "El texto es demasiado largo. Acortá el resumen o la lista de productos.",
+    upstream_error: "Se cortó la conexión mientras se escribía. Probá de nuevo."
+  };
+  const FATAL = ["no_key","not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
+  function today(){ try{ return new Date().toLocaleDateString("es-UY", {day:"numeric", month:"long", year:"numeric"}); }catch(e){ return ""; } }
+
+  async function generate(turns, opts, mode, store){
+    if (busy || altBusy || refine) return;
+    $("banner").hidden = true;
+    const prev = {text: st.text, conv: st.conv, mode: st.mode, store: st.store, date: st.date, tab: st.tab, ideas: st.ideas, status: st.status, todo: st.todo};
+    busy = true; userPickedTab = false;
+    st.mode = mode; st.store = store; st.text = ""; st.tab = 0; st.done = false; st.ideas = {}; st.status = {}; st.todo = {};
+    ctl = new AbortController();
+    show("week");
+    let last = 0;
+    try{
+      const res = await sample(turns, Object.assign({cache:false, signal: ctl.signal, onText: ({text}) => {
+        st.text = text;
+        const now = Date.now(); if (now - last > 250){ last = now; renderWeek(); }
+      }}, opts || {}));
+      st.text = res.text; st.conv = turns.concat([{role:"assistant", content: res.text}]); st.date = today();
+      if (res.truncated) banner("La respuesta quedó cortada antes de terminar. Abrí \"¿Querés cambiar algo?\" y pedí que complete lo que falta.", false);
+    }catch(e){
+      const code = e && e.code;
+      if (e && e.text && code !== "refused"){
+        st.text = e.text; st.conv = turns.concat([{role:"assistant", content: e.text}]); st.date = today();
+        banner(code === "cancelled" ? "Detuviste la generación. Quedó lo que se llegó a escribir." : "La respuesta se interrumpió. Quedó lo que se llegó a escribir; podés probar de nuevo.", code !== "cancelled");
+      } else {
+        Object.assign(st, prev);
+        if (FATAL.includes(code)){
+          blocked = true;
+          banner("La generación no está disponible: falta configurar la clave de la IA en el servidor (GEMINI_API_KEY).", true);
+        } else if (code && code !== "cancelled"){ banner(ERR[code] || ERR.upstream_error, true); }
+      }
+    }finally{
+      busy = false; ctl = null; st.done = true;
+      const r = extractResumen(st.text); if (r) $("r_resumen").value = r;
+      save();
+      if (st.text && st.view === "week"){ renderWeek(); refreshButtons(); }
+      else show(st.text ? "week" : (mode === "analysis" ? "res" : "form"));
+    }
+  }
+  $("stopBtn").onclick = () => ctl && ctl.abort();
+
+  const STEPS = 4;
+  function step1ok(){ return !!(v("f_nombre") && v("f_productos")); }
+  function showStep(n){
+    st.step = Math.max(0, Math.min(STEPS - 1, n));
+    document.querySelectorAll("#formPlan .step").forEach(f => f.hidden = +f.dataset.step !== st.step);
+    document.querySelectorAll("#steplabels button").forEach((b, i) => {
+      b.classList.toggle("on", i === st.step); b.classList.toggle("done", i < st.step);
+      b.disabled = i > 0 && !step1ok();
+      if (i === st.step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+    });
+    $("stepBar").style.width = ((st.step + 1) / STEPS * 100) + "%";
+    $("stepPrev").hidden = st.step === 0;
+    const lastStep = st.step === STEPS - 1;
+    $("stepNext").hidden = lastStep; $("genBtn").hidden = !lastStep;
+    $("stepNext").disabled = st.step === 0 && !step1ok();
+    save();
+  }
+  document.querySelectorAll("#steplabels button").forEach(b => b.onclick = () => { showStep(+b.dataset.go); const f = document.querySelector('#formPlan .step:not([hidden]) input, #formPlan .step:not([hidden]) textarea'); if (f) f.focus(); });
+  $("stepPrev").onclick = () => showStep(st.step - 1);
+  document.addEventListener("input", () => { if (!$("viewForm").hidden) showStep(st.step); });
+
+  $("formPlan").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (st.step < STEPS - 1){ if (!$("stepNext").disabled){ showStep(st.step + 1); window.scrollTo({top: 0}); } return; }
+    if ($("genBtn").disabled) return;
+    generate([{role:"user", content: INTRO + RULES + FORMAT_PLAN + "\n\n===== FIN DE LAS INSTRUCCIONES =====\n\n" + answers()}], null, "plan", v("f_nombre"));
+  });
+
+  $("formRes").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if ($("anaBtn").disabled) return;
+    let t = "La tienda vuelve después de publicar los videos de la semana. Estamos en la ETAPA 3.\n\nSu RESUMEN DE APRENDIZAJES anterior:\n" + v("r_resumen") + "\n";
+    if (files.length) t += "\nSubió " + files.length + " captura(s) de las estadísticas de sus videos. Leé los números de cada imagen.\n";
+    if (v("r_numeros")) t += "\nNúmeros que escribió la tienda:\n" + v("r_numeros") + "\n";
+    t += "\nHacé el análisis completo y el nuevo plan de 5 videos, con el RESUMEN DE APRENDIZAJES actualizado al final.";
+    const m = v("r_resumen").match(/RESUMEN DE APRENDIZAJES\s*[–-]\s*([^–\n-]+)/);
+    generate([{role:"user", content: INTRO + RULES + FORMAT_ANALYSIS + "\n\n===== FIN DE LAS INSTRUCCIONES =====\n\n" + t}], files.length ? {images: files.slice()} : null, "analysis", m ? m[1].trim() : st.store);
+  });
+
+  $("refineForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const ask = v("refineIn");
+    if (!ask || !st.conv.length || busy) return;
+    $("refineIn").value = "";
+    refineWeek(ask);
+  });
+
+  async function refineWeek(ask){
+    if (busy || altBusy || refine || !st.conv.length) return;
+    $("banner").hidden = true;
+    const now = view().out;
+    const msg = "Así está ahora la semana que ve la tienda (puede incluir ideas que eligió después):\n\n" + compose(now) +
+      "\n\nLa tienda pide este cambio: " + ask +
+      "\n\nDevolvé SOLO las secciones que cambian, cada una con su marcador (===VIDEO 3===, etc.) y completa. No devuelvas las secciones que quedan iguales. " +
+      "Si cambiás algún video, devolvé también ===RESUMEN=== con la tabla actualizada (una fila por video, en orden) y, si hace falta, el día de grabación. Si cambia el resumen de aprendizajes, devolvé ===CIERRE===. " +
+      "Respetá todas las reglas (ángulos distintos, ganchos, formatos) y la REVISIÓN FINAL. Empezá directamente con el primer marcador.";
+    const turns = st.conv.concat([{role: "user", content: msg}]);
+    refine = {text: "", out: {}, current: null, doneKeys: []};
+    ctl = new AbortController();
+    renderWeek(); refreshButtons();
+    let last = 0;
+    const parse = (text) => {
+      const sec = sections(text);
+      const known = tabsDef().map(([k]) => k);
+      refine.out = {}; Object.keys(sec.out).forEach(k => { if (known.includes(k) && /={3}/.test(text)) refine.out[k] = sec.out[k]; });
+      refine.current = norm(sec.current || "");
+      refine.doneKeys = Object.keys(refine.out).filter(k => k !== refine.current);
+    };
+    try{
+      const res = await sample(turns, {cache: false, signal: ctl.signal, onText: ({text}) => { refine.text = text; parse(text); const t = Date.now(); if (t - last > 250){ last = t; renderWeek(); } }});
+      parse(res.text);
+      applyRefine(refine.out);
+      st.conv = turns.concat([{role: "assistant", content: res.text}]);
+      if (!Object.keys(refine.out).length) banner("No se detectó ningún cambio para aplicar. Probá escribir el pedido de otra forma.", false);
+    }catch(e){
+      const code = e && e.code;
+      if (code && code !== "cancelled") banner(ERR[code] || ERR.upstream_error, true);
+      else if (code === "cancelled") banner("Detuviste el cambio. La semana quedó como estaba.", false);
+    }finally{
+      refine = null; ctl = null; save(); renderWeek(); refreshButtons();
+    }
+  }
+  function applyRefine(changes){
+    const base = sections(st.text).out;
+    const t = changes.RESUMEN ? tableOf(changes.RESUMEN) : null;
+    Object.keys(changes).forEach(k => {
+      const txt = changes[k].trim(); if (!txt) return;
+      if (/^VIDEO/.test(k)){
+        const n = +k.replace(/\D/g, "");
+        const I = st.ideas[k] || {list: [base[k]], seen: 0, rows: [baseRow(n)]};
+        if (!I.rows) I.rows = I.list.map(() => null);
+        I.list.push(txt); I.rows.push(t && t.rows[n - 1] ? t.rows[n - 1] : null); I.seen = I.list.length - 1;
+        st.ideas[k] = I; st.status[k] = {g: false, p: false};
+      } else {
+        base[k] = txt;
+      }
+    });
+    if (changes.RESUMEN && t){
+      // la tabla nueva ya refleja las ideas elegidas: sus filas pasan a ser las de la idea vista de cada video
+      for (let n = 1; n <= 5; n++){ const I = st.ideas["VIDEO " + n]; if (I && t.rows[n - 1]) { if (!I.rows) I.rows = []; I.rows[I.seen] = t.rows[n - 1]; } }
+    }
+    st.text = compose(base);
+    const r = extractResumen(st.text); if (r) $("r_resumen").value = r;
+  }
+
+  // ---------- arranque ----------
+  load();
+  show(st.view === "week" || st.view === "res" ? st.view : "form");
+  (async () => {
+    // Conexión con nuestro servidor (server.js), que habla con Gemini.
+    const IMG = {mediaTypes: ["image/png", "image/jpeg", "image/webp"], maxCount: 5};
+    const toB64 = (f) => new Promise((ok, bad) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(",")[1]); r.onerror = bad; r.readAsDataURL(f); });
+    const fail = (code, text) => { const e = new Error(code); e.code = code; if (text) e.text = text; return e; };
+    const s = async function(turns, opts){
+      opts = opts || {};
+      let text = "";
+      try{
+        const images = opts.images ? await Promise.all(opts.images.map(async f => ({mimeType: f.type, data: await toB64(f)}))) : [];
+        const resp = await fetch("/api/generate", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({turns, images}), signal: opts.signal});
+        if (!resp.ok){ let c = "upstream_error"; try{ c = (await resp.json()).error || c; }catch(e){} throw fail(c); }
+        const reader = resp.body.getReader(), dec = new TextDecoder();
+        let buf = "", truncated = false, finished = false;
+        for (;;){
+          const {value, done} = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, {stream: true});
+          let i;
+          while ((i = buf.indexOf("\n")) >= 0){
+            const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+            if (!line) continue;
+            const ev = JSON.parse(line);
+            if (ev.t){ text += ev.t; if (opts.onText) opts.onText({text}); }
+            else if (ev.error) throw fail(ev.error, text);
+            else if (ev.done){ truncated = !!ev.truncated; finished = true; }
+          }
+        }
+        if (!finished) throw fail("upstream_error", text);
+        if (!text) throw fail("empty_completion");
+        return {text, truncated};
+      }catch(e){
+        if (e && e.name === "AbortError") throw fail("cancelled", text);
+        if (e && e.code) throw e;
+        throw fail("upstream_error", text);
+      }
+    };
+    s.limits = async () => ({images: IMG});
+    const d = {save: async ({filename, data}) => {
+      const url = URL.createObjectURL(new Blob([data], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}));
+      const a = document.createElement("a"); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }};
+    downloads = d;
+    let ok = false;
+    try{ const h = await (await fetch("/api/health")).json(); ok = !!h.hasKey; }catch(e){}
+    sample = ok ? s : null;
+    if (!sample){
+      blocked = true; refreshButtons();
+      banner("El servidor todavía no tiene la clave de la IA (GEMINI_API_KEY), así que no se pueden generar guiones. Podés completar el formulario igual: queda guardado.", false);
+      if (st.view === "week") renderWeek();
+      return;
+    }
+    try{ const lim = await sample.limits(); imgLimits = lim && lim.images ? lim.images : null; }catch(e){ imgLimits = null; }
+    ready = true; refreshButtons();
+    if (st.view === "week") renderWeek();
+  })();
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,12 @@
+{
+  "name": "estratega-de-reels",
+  "version": "1.0.0",
+  "description": "Guiones de TikTok y Reels para tiendas de nicho de Uruguay",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
