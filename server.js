@@ -9,7 +9,14 @@ const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 const KEY = process.env.GEMINI_API_KEY || "";
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+// Modelos a probar, en orden. Si uno está saturado o no existe, se pasa al siguiente.
+// GEMINI_MODEL puede ser uno solo o varios separados por coma.
+const MODELS = [...new Set(
+  (process.env.GEMINI_MODEL || "gemini-3.8-flash").split(",").map(s => s.trim()).filter(Boolean)
+    .concat(["gemini-flash-latest", "gemini-flash-lite-latest"])
+)];
+const MODEL = MODELS[0];
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
 const BASE = process.env.GEMINI_BASE || "https://generativelanguage.googleapis.com/v1beta";
 const MAX_BODY = 18 * 1024 * 1024; // texto + capturas
 const PAGE = fs.readFileSync(path.join(__dirname, "index.html"));
@@ -67,20 +74,37 @@ async function generate(req, res){
   const ctl = new AbortController();
   res.on("close", () => { if (!res.writableEnded) ctl.abort(); });
 
-  let up;
-  try{
-    up = await fetch(`${BASE}/models/${encodeURIComponent(MODEL)}:streamGenerateContent?alt=sse`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json", "x-goog-api-key": KEY},
-      body: JSON.stringify({contents, generationConfig: {temperature: 0.9, maxOutputTokens: 32768}}),
-      signal: ctl.signal
-    });
-  }catch(e){ return sendJSON(res, 502, {error: "session_expired"}); }
+  // Probamos cada modelo; si Google dice "saturado" (503/500) reintentamos una vez,
+  // y si sigue saturado, no existe (404) o se acabó su cuota (429), pasamos al siguiente.
+  const payload = JSON.stringify({contents, generationConfig: {temperature: 0.9, maxOutputTokens: 32768}});
+  let up = null, lastStatus = 0, lastMsg = "";
+  outer:
+  for (const model of MODELS){
+    for (let attempt = 0; attempt < 2; attempt++){
+      if (ctl.signal.aborted) return res.end();
+      try{
+        up = await fetch(`${BASE}/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json", "x-goog-api-key": KEY},
+          body: payload,
+          signal: ctl.signal
+        });
+      }catch(e){ up = null; lastStatus = 0; lastMsg = "sin conexión"; console.error("Gemini", model, "sin conexión"); await wait(1500); continue; }
+      if (up.ok){ if (model !== MODEL) console.log("Usando el modelo de respaldo", model); break outer; }
+      lastStatus = up.status; lastMsg = "";
+      try{ lastMsg = (await up.json()).error.message; }catch(e){}
+      console.error("Gemini", model, up.status, lastMsg);
+      up = null;
+      if (up === null && (lastStatus === 503 || lastStatus === 500) && attempt === 0){ await wait(2000); continue; }
+      if ([404, 429, 500, 503].includes(lastStatus) || lastStatus === 0) continue outer;
+      break outer; // otro error (clave mala, pedido inválido): no tiene sentido seguir probando
+    }
+  }
 
-  if (!up.ok){
-    let msg = ""; try{ msg = (await up.json()).error.message; }catch(e){}
-    console.error("Gemini", up.status, msg);
-    return sendJSON(res, up.status === 429 ? 429 : 502, {error: errorCode(up.status, msg)});
+  if (!up){
+    if (lastStatus === 0) return sendJSON(res, 502, {error: "session_expired"});
+    const code = (lastStatus === 503 || lastStatus === 500) ? "busy" : errorCode(lastStatus, lastMsg);
+    return sendJSON(res, lastStatus === 429 ? 429 : 502, {error: code});
   }
 
   // Le pasamos el texto a la página a medida que se escribe: una línea JSON por pedazo.
