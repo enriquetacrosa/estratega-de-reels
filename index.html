@@ -123,7 +123,7 @@ input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent);ba
 .md mark{background:var(--mark);color:var(--mark-ink);padding:1px 5px;border-radius:5px;font-weight:600}
 .tbl{overflow-x:auto;margin:.9em 0;border:1px solid var(--line);border-radius:10px}
 .md table{border-collapse:collapse;font-size:15px;min-width:100%}
-.md th,.md td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+.md th,.md td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;overflow-wrap:normal;word-break:normal;hyphens:none;min-width:6em}
 .md tr:last-child td{border-bottom:none}
 .md th{font-family:var(--head);font-size:12.5px;font-weight:700;color:var(--muted);background:var(--field)}
 
@@ -561,25 +561,38 @@ CÓMO RECIBÍS LOS RESULTADOS
 - Antes de analizar, mostrá la tabla que armaste y pedí que confirmen que los números están bien.
 
 CÓMO ANALIZÁS
-1. Calculá el promedio de vistas de la semana. Un video funcionó si superó ese promedio. Compará siempre contra la propia tienda, nunca contra números generales: una cuenta chica con 500 vistas puede estar yendo bien.
+0. DATOS DE CADA VIDEO: el tema, el formato, el tipo de gancho y el objetivo de cada video los sacás de la línea "Videos de la semana" del RESUMEN DE APRENDIZAJES o de lo que escribió la tienda junto a los números. Copialos tal cual. Nunca los deduzcas ni los cambies (si el Video 1 era POV, en tu tabla dice POV). Si no aparecen en ningún lado, escribí "sin dato" en esa celda.
+   Los productos y precios los sacás de la línea "Productos y precios" del resumen o de lo que escribió la tienda. Si están ahí, no los pongas en [COMPLETAR] ni en "Lo que supuse".
+1. Si la tienda te dio el promedio de vistas de su cuenta, compará contra ese. Si no, calculá el promedio de vistas de la semana. Un video funcionó si superó ese promedio. Compará siempre contra la propia tienda, nunca contra números generales: una cuenta chica con 500 vistas puede estar yendo bien.
 2. Juzgá cada video según su objetivo: un video de guardados se mide por los guardados, uno de ventas por los mensajes o ventas.
 3. Explicá en palabras simples qué pasó:
    - Pocas vistas → el gancho no atrapó o el tema no interesó.
    - Muchas vistas pero pocas acciones → atrapó, pero el CTA no fue claro.
    - Muchos guardados o compartidos → el tema le sirve a la gente: hay que repetirlo.
-4. Fijate qué tipo de gancho y qué formato tuvieron los videos que mejor anduvieron.
+4. Fijate qué tipo de gancho y qué formato tuvieron los videos que mejor anduvieron. Las conclusiones van sobre el FORMATO REAL de cada video: si el que mejor anduvo era de humor, la conclusión habla del humor, no de "contenido educativo". Nunca le atribuyas a un video un formato que no tuvo.
 5. Mostrá:
-   a. Tabla: Video | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos
+   a. Tabla: Video | Formato | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos
    b. Las 3 cosas más importantes de esta semana.
    c. El nuevo plan de 5 videos (como en la Etapa 2, con su revisión final), con la mayoría basados en lo que funcionó y al menos uno probando algo nuevo. Marcá qué cambiaste y por qué.
+   d. "Lo que supuse" del análisis: solo supuestos sobre los resultados o sobre el plan nuevo. No pongas cómo se graba ni cómo se empaqueta.
+
+REVISIÓN DEL ANÁLISIS (obligatoria, antes de entregar; no la muestres)
+1. ¿El formato, el tipo de gancho y el objetivo de cada video en tu tabla son exactamente los del resumen o los que escribió la tienda? Si alguno no coincide, corregilo.
+2. ¿Cada una de "Las 3 cosas más importantes" nombra el formato que de verdad tuvo ese video? Ej: si el video de humor fue el mejor y el educativo el peor, no podés decir que "lo educativo funciona".
+3. ¿El plan nuevo contradice lo que no funcionó? Si un formato, ángulo o tema no cumplió (por ejemplo, un video centrado en el envío), no lo vuelvas a usar como base de un video. Solo puede volver como "prueba" con un enfoque distinto, y lo explicás.
+4. ¿Los porcentajes y comparaciones (el doble, el triple) están bien calculados?
+5. ¿Pusiste en [COMPLETAR] o en "Lo que supuse" algún precio o producto que ya estaba en el resumen o en lo que escribió la tienda? Usá ese dato y sacalo.
+6. ¿Terminaste con el RESUMEN DE APRENDIZAJES actualizado, con "Formatos que funcionan", "Tipos de gancho que anduvieron mejor/no anduvieron" y "Promedio de vistas" completos con los resultados de esta semana, y "Videos de la semana" con los 5 videos NUEVOS?
 
 ----------------------------------------
 RESUMEN DE APRENDIZAJES
 ----------------------------------------
-Al terminar cada plan o análisis, cerrá con este bloque y decile a la tienda que lo guarde y lo pegue la próxima vez que use el chat:
+Al terminar cada plan o análisis, cerrá con este bloque y decile a la tienda que lo guarde y lo pegue la próxima vez que use el chat.
+Las 5 líneas finales (Video 1 a Video 5) son la línea "Videos de la semana": van siempre con los videos del plan que estás entregando, cada una en su propia línea con guion.
 
 RESUMEN DE APRENDIZAJES – [nombre de la tienda] – Semana [número]
 - Tienda: [nombre y cómo le dicen, qué vende, diferencial, público, tono, canal de venta]
+- Productos y precios (tal como los dijo la tienda): [cada producto con su precio, separados por punto y coma]
 - Beneficios (tal como los dijo la tienda): [...]
 - Hashtags de marca: [...]
 - Tiempo para grabar: [...]
@@ -591,6 +604,11 @@ RESUMEN DE APRENDIZAJES – [nombre de la tienda] – Semana [número]
 - Tipos de gancho que no anduvieron: [...]
 - Promedio de vistas de la cuenta: [...]
 - Próximo objetivo: [...]
+- Video 1 (lunes): [tema] · Formato: [...] · Gancho: [...] · Objetivo: [...]
+- Video 2 (martes): [tema] · Formato: [...] · Gancho: [...] · Objetivo: [...]
+- Video 3 (miércoles): [tema] · Formato: [...] · Gancho: [...] · Objetivo: [...]
+- Video 4 (jueves): [tema] · Formato: [...] · Gancho: [...] · Objetivo: [...]
+- Video 5 (viernes): [tema] · Formato: [...] · Gancho: [...] · Objetivo: [...]
 
 REGLAS QUE NUNCA ROMPÉS
 - No inventes precios, productos, características ni beneficios de la tienda.
@@ -639,7 +657,7 @@ REGLAS QUE NUNCA ROMPÉS
     "\n\n===== FORMATO DE ENTREGA (obligatorio; la página arma una pestaña por sección) =====\n" +
     "Empezá directamente con el primer marcador, sin texto antes. Cada marcador va solo en su línea:\n" +
     "===ANALISIS===\n" +
-    "\"### Los números que leí\" con la tabla de cada video (marcá con \"?\" los que no se lean bien y aclaralo). \"### Qué funcionó y qué no\" con la tabla Video | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos. \"### Lo más importante de esta semana\" con 3 puntos. \"### Qué cambia en la semana nueva\". Si supusiste algo, \"### Lo que supuse\".\n" +
+    "\"### Los números que leí\" con la tabla de cada video (marcá con \"?\" los que no se lean bien y aclaralo). \"### Qué funcionó y qué no\" con la tabla Video | Formato | Tipo de gancho | Objetivo | ¿Cumplió? | Qué pasó | Qué hacemos (formato, gancho y objetivo copiados del resumen, nunca deducidos). En la columna Video poné solo \"Video 1\", \"Video 2\", etc. \"### Lo más importante de esta semana\" con 3 puntos. \"### Qué cambia en la semana nueva\". Si supusiste algo, \"### Lo que supuse\".\n" +
     "===RESUMEN===\n" +
     "\"### La semana\" con la tabla resumen del nuevo plan, una fila por video en orden, columnas Día | Tema del video | Ángulo | Formato | Tipo de gancho | Objetivo, y \"### Día de grabación\" si corresponde.\n" + FORMAT_COMMON;
 
@@ -1366,7 +1384,7 @@ REGLAS QUE NUNCA ROMPÉS
     let t = "La tienda vuelve después de publicar los videos de la semana. Estamos en la ETAPA 3.\n\nSu RESUMEN DE APRENDIZAJES anterior:\n" + v("r_resumen") + "\n";
     if (files.length) t += "\nSubió " + files.length + " captura(s) de las estadísticas de sus videos. Leé los números de cada imagen.\n";
     if (v("r_numeros")) t += "\nNúmeros que escribió la tienda:\n" + v("r_numeros") + "\n";
-    t += "\nHacé el análisis completo y el nuevo plan de 5 videos, con el RESUMEN DE APRENDIZAJES actualizado al final.";
+    t += "\nHacé el análisis completo y el nuevo plan de 5 videos, con el RESUMEN DE APRENDIZAJES actualizado al final. Antes de entregar, hacé la REVISIÓN DEL ANÁLISIS y la REVISIÓN FINAL del plan.";
     const m = v("r_resumen").match(/RESUMEN DE APRENDIZAJES\s*[–-]\s*([^–\n-]+)/);
     generate([{role:"user", content: INTRO + RULES + FORMAT_ANALYSIS + "\n\n===== FIN DE LAS INSTRUCCIONES =====\n\n" + t}], files.length ? {images: files.slice()} : null, "analysis", m ? m[1].trim() : st.store);
   });
